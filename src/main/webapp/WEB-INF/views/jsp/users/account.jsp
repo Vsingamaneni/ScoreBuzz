@@ -97,12 +97,10 @@
         </c:if>
 
         <c:if test="${role.equalsIgnoreCase('admin')}">
-            <a href="/saveResult" class="w3-bar-item w3-button w3-padding"><i class="fa fa-legal"></i>&nbsp; Update
+            <a href="/saveResult" style="text-decoration: none" class="w3-bar-item w3-button w3-padding"><i class="fa fa-legal"></i>&nbsp; Update
                 Result</a>
-            <a href="/showReviews" style="text-decoration : none;" class="w3-bar-item w3-button w3-padding"><i
-                    class="fa fa-legal"></i>&nbsp; Show Reviews</a>
         </c:if>
-        <a href="/logout" class="w3-bar-item w3-button w3-padding"><i class="fa fa-power-off"></i>&nbsp; Logout</a>
+        <a href="/logout" style="text-decoration: none" class="w3-bar-item w3-button w3-padding"><i class="fa fa-power-off"></i>&nbsp; Logout</a>
     </div>
 </nav>
 <!-- Overlay effect when opening sidebar on small screens -->

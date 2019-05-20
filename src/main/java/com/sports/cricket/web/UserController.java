@@ -3,7 +3,6 @@ package com.sports.cricket.web;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -26,7 +25,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.sports.cricket.service.UserService;
 import com.sports.cricket.validator.UserFormValidator;
 
 @Controller
@@ -80,7 +78,7 @@ public class UserController implements Serializable {
                 httpSession.removeAttribute("loginErrorDetails");
             }
             model.addAttribute("userLogin", userLogin);
-            return "users/index";
+            return "users/login/index";
         }
         return "redirect:/profile";
     }
@@ -263,7 +261,7 @@ public class UserController implements Serializable {
 
         logger.debug("Register User()");
         model.addAttribute("registerForm", register);
-        return "users/register";
+        return "users/login/register";
     }
 
     // Display predictions
@@ -317,7 +315,7 @@ public class UserController implements Serializable {
             List<ErrorDetails> errorDetailsList = (List<ErrorDetails>)httpSession.getAttribute("errorDetailsList");
             model.addAttribute("errorDetailsList", errorDetailsList);
             httpSession.removeAttribute("errorDetailsList");
-            return "users/forget";
+            return "users/login/forget";
         }
 
         Register register = new Register();
@@ -326,7 +324,7 @@ public class UserController implements Serializable {
         model.addAttribute("registerForm", register);
 
         if (null == httpSession.getAttribute("session")) {
-            return "users/forget";
+            return "users/login/forget";
         } else {
             return "redirect:/resetPassword";
         }
@@ -362,7 +360,7 @@ public class UserController implements Serializable {
         model.addAttribute("userDetails", userDetails);
 
         if (null == httpSession.getAttribute("session")) {
-            return "users/reset";
+            return "users/login/reset";
         } else {
             return "redirect:/";
         }
@@ -495,7 +493,7 @@ public class UserController implements Serializable {
             model.addAttribute("userReview", userReview);
 
             httpSession.setMaxInactiveInterval(5 * 60);
-            return "users/userreview";
+            return "users/reviews/userreview";
         }
     }
 
@@ -531,7 +529,7 @@ public class UserController implements Serializable {
             //model.addAttribute("rating", rating);
 
             httpSession.setMaxInactiveInterval(5 * 60);
-            return "users/review";
+            return "users/reviews/review";
         }
     }
 
@@ -559,7 +557,7 @@ public class UserController implements Serializable {
             model.addAttribute("reviewList", reviewList);
 
             httpSession.setMaxInactiveInterval(5 * 60);
-            return "users/showreviews";
+            return "users/reviews/showreviews";
         }
     }
 
@@ -584,7 +582,7 @@ public class UserController implements Serializable {
             model.addAttribute("overAllReview", overAllReview);
 
             httpSession.setMaxInactiveInterval(5 * 60);
-            return "users/review";
+            return "users/reviews/review";
         }
     }
 
@@ -970,7 +968,7 @@ public class UserController implements Serializable {
             model.addAttribute("trackSettlement", trackSettlement);
 
             httpSession.setMaxInactiveInterval(5 * 60);
-            return "users/addSettlement";
+            return "users/settlement/addSettlement";
         }
     }
 
@@ -1040,7 +1038,7 @@ public class UserController implements Serializable {
             model.addAttribute("settlementDetails", settlementDetails);
 
             httpSession.setMaxInactiveInterval(5 * 60);
-            return "users/settlement";
+            return "users/settlement/settlement";
         }
     }
 
@@ -1067,7 +1065,7 @@ public class UserController implements Serializable {
             model.addAttribute("mySettlementHistory", mySettlementHistory);
 
             httpSession.setMaxInactiveInterval(5 * 60);
-            return "users/display";
+            return "users/settlement/display";
         }
     }
 
@@ -1097,16 +1095,28 @@ public class UserController implements Serializable {
 
             List<StatsDetails> winAndLossCount = StatisticsDetails.getWinsAndLosses(standingsList, registerList);
             StatisticsDetails.pickTopTenWinningCount(winAndLossCount);
-            model.addAttribute("winAndLossCount", winAndLossCount.subList(0,10));
+            if (winAndLossCount.size() > 10) {
+                model.addAttribute("winAndLossCount", winAndLossCount.subList(0, 10));
+            } else {
+                model.addAttribute("winAndLossCount", winAndLossCount.subList(0, winAndLossCount.size()));
+            }
 
             List<StatsDetails> lossDetails = new ArrayList<>(winAndLossCount);
 
-            StatisticsDetails.pickTopTenLoosingCount(lossDetails);
-            model.addAttribute("lossDetails", lossDetails.subList(0,10));
+            lossDetails = StatisticsDetails.pickTopTenLoosingCount(lossDetails);
+            if (lossDetails.size() > 10) {
+                model.addAttribute("lossDetails", lossDetails.subList(0, 10));
+            } else {
+                model.addAttribute("lossDetails", lossDetails.subList(0, lossDetails.size()));
+            }
 
             List<StatsDetails> winAndLossAmounts = StatisticsDetails.getHighestWinning(standingsList, registerList);
             StatisticsDetails.pickTopTenWonAmounts(winAndLossAmounts);
-            model.addAttribute("winAndLossAmounts", winAndLossAmounts.subList(0, 10));
+            if (winAndLossAmounts.size() > 10) {
+                model.addAttribute("winAndLossAmounts", winAndLossAmounts.subList(0, 10));
+            } else {
+                model.addAttribute("winAndLossAmounts", winAndLossAmounts.subList(0, winAndLossAmounts.size()));
+            }
 
             StatsDetails userStats = StatisticsDetails.getIndividualStats(standingsList,register);
             model.addAttribute("userStats", userStats);
