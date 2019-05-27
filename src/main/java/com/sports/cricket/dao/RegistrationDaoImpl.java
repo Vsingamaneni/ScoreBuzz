@@ -245,11 +245,14 @@ public class RegistrationDaoImpl implements RegistrationDao, Serializable {
     }
 
     @Override
-    public List<Restrictions> getRestrictions() {
+    public Restrictions getRestrictions() {
         String sql = "Select * from RESTRICTIONS";
-        List<Restrictions> restrictions = null;
 
-        restrictions = jdbcTemplate.query(sql,new BeanPropertyRowMapper(Restrictions.class));
+        Restrictions restrictions = null;
+        Map<String, Object> params = new HashMap<>();
+
+
+        restrictions = (Restrictions) jdbcTemplate.queryForObject(sql, new Object[]{}, new BeanPropertyRowMapper(Restrictions.class));
 
         return restrictions;
     }

@@ -9,6 +9,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static java.util.Comparator.nullsLast;
+import static java.util.Comparator.reverseOrder;
+
 public class LeaderBoardDetails implements Serializable {
 
     public static List<LeaderBoard> mapLeaderBoard(List<Standings> standingsList , List<Register> registerList){
@@ -146,7 +149,7 @@ public class LeaderBoardDetails implements Serializable {
         return null;
     }
 
-    public static List<LeaderBoard>  mapTopTenLeaderBoard(List<Standings> standingsList, List<Register> registerList) {
+    public static List<LeaderBoard>  mapTopTenLeaderBoard(List<Standings> standingsList, List<Register> registerList, Restrictions restrictions) {
         List<LeaderBoard> leaderBoardList = new ArrayList<>();
         LeaderBoard leaderBoard;
         if (!CollectionUtils.isEmpty(standingsList)) {
@@ -174,11 +177,32 @@ public class LeaderBoardDetails implements Serializable {
             }
         }
 
-        Comparator.comparing((LeaderBoard p)->p.getTotalWins())
-                .thenComparingInt(p->p.getPredictedCount())
-                .thenComparing(p->p.getFirstName());
+        Collections.sort(leaderBoardList, Comparator.comparing(LeaderBoard::getTotalWins).reversed()
+                .thenComparing(LeaderBoard::getPredictedCount));
+
+      //  Collections.sort(leaderBoardList, COUNT_TOP_WINS);
+      //  Collections.sort(leaderBoardList, COUNT_LESS_PREDICTIONS);
+
+        int count = 1;
+
+        for(LeaderBoard leader : leaderBoardList){
+            if (restrictions.getCount() >= count){
+                leader.setPrizeMoney(restrictions.getPrize());
+            } else {
+                leader.setPrizeMoney(0);
+            }
+
+            leader.setRank(count);
+            count++;
+        }
 
         return leaderBoardList;
     }
+
+    private static final Comparator<LeaderBoard> COUNT_TOP_WINS = Comparator
+            .comparing(LeaderBoard::getTotalWins);
+
+    private static final Comparator<LeaderBoard> COUNT_LESS_PREDICTIONS = Comparator
+            .comparing(LeaderBoard::getPredictedCount);
 
 }

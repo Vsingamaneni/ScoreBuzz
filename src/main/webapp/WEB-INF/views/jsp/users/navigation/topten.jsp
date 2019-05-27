@@ -15,7 +15,6 @@
     <a href="/history/2" style="text-decoration : none;" class="w3-bar-item w3-button w3-padding"><i class="fa fa-history fa-fw"></i>&nbsp; TopTen History</a>
     <a href="/topTenStandings" style="text-decoration : none;" class="w3-bar-item w3-button w3-padding"><i class="fa fa-bar-chart"></i>&nbsp; TopTen Standings</a>
     <a href="/showAllUsers" style="text-decoration : none;" class="w3-bar-item w3-button w3-padding"><i class="fa fa-child"></i>&nbsp; Users</a>
-    <a href="/statistics" style="text-decoration : none;" class="w3-bar-item w3-button w3-padding"><i class="fa fa-pie-chart"></i>&nbsp; Stats</a>
 </head>
 <body>
 

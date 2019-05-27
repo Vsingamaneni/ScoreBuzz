@@ -54,15 +54,6 @@ public class ScheduleDaoImpl implements ScheduleDao, Serializable {
     }
 
     @Override
-    public List<Schedule> topTenScheduleList() {
-        String sql = "SELECT * FROM TOP_SCHEDULE";
-
-        List<Schedule> result = jdbcTemplate.query(sql, new BeanPropertyRowMapper(Schedule.class));
-
-        return result;
-    }
-
-    @Override
     public Schedule findById(Integer matchNumber,  String name) {
 
         Map<String, Object> params = new HashMap<>();

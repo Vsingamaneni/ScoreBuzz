@@ -47,7 +47,7 @@ public class RegistrationServiceImpl implements RegistrationService, Serializabl
     }
 
     @Override
-    public List<Restrictions> getRestrictions() {
+    public Restrictions getRestrictions() {
         return registrationDao.getRestrictions();
     }
 

@@ -19,7 +19,7 @@ public interface RegistrationService {
 
     List<Register> getAllUsers();
 
-    List<Restrictions> getRestrictions();
+    Restrictions getRestrictions();
 
     boolean optOutUser(Integer memberId, String optOut);
 

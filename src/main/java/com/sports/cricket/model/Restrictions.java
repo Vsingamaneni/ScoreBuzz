@@ -8,6 +8,10 @@ public class Restrictions implements Serializable {
 
     private Integer maxLimit;
 
+    private Integer prize;
+
+    private Integer count;
+
     public String getSecurityCode() {
         return securityCode;
     }
@@ -22,5 +26,21 @@ public class Restrictions implements Serializable {
 
     public void setMaxLimit(Integer maxLimit) {
         this.maxLimit = maxLimit;
+    }
+
+    public Integer getPrize() {
+        return prize;
+    }
+
+    public void setPrize(Integer prize) {
+        this.prize = prize;
+    }
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
     }
 }

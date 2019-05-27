@@ -29,11 +29,6 @@ public class ScheduleServiceImpl implements ScheduleService, Serializable {
     }
 
     @Override
-    public List<Schedule> topTenScheduleList() {
-        return scheduleDao.topTenScheduleList();
-    }
-
-    @Override
     public Schedule findById(Integer matchNumber,  String name) {
         return scheduleDao.findById(matchNumber, name);
     }

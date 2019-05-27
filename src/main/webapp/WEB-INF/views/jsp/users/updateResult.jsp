@@ -136,7 +136,7 @@
                                 </tr>
                                 </thead>
                                 <tr style="color:black;font-size:20px;text-decoration:none;font-family:Comic Sans MS">
-                                    <form action="/matchResult/update/${type}" modelAttribute="schedule" method="POST"
+                                    <form action="/matchResult/update" modelAttribute="schedule" method="POST"
                                           class='form-horizontal' role='form'>
                                         <td style="text-align:left;"> ${schedule.matchNumber}</td>
                                         <td style="text-align:left;">${fn:toUpperCase(schedule.homeTeam)}

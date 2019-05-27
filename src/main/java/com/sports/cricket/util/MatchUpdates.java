@@ -114,6 +114,9 @@ public class MatchUpdates implements Serializable {
                     predictedCount = predictedCount + standings.getPredictedCount();
                     standings.setWinCount(winCount);
                     standings.setPredictedCount(predictedCount);
+                } else {
+                    standings.setWinCount(winCount);
+                    standings.setPredictedCount(predictedCount);
                 }
             }
         }

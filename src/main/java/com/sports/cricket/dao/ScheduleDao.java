@@ -10,8 +10,6 @@ public interface ScheduleDao {
 
     List<Schedule> scheduleList();
 
-    List<Schedule> topTenScheduleList();
-
     Schedule findById(Integer matchNumber,  String name);
 
     List<Prediction> findPredictions(Integer memberId);

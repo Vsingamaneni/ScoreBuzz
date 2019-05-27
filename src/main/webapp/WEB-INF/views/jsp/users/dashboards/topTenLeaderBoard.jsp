@@ -39,7 +39,6 @@
 <c:if test="${not empty session}">
     <c:set var="user_name" value="${session.firstName}"/>
     <c:set var="role" value="${session.role}"/>
-    <c:set var="isActivated" value="${}"/>
 </c:if>
 
 <c:if test="${empty session}">
@@ -119,7 +118,12 @@
                             <td style="text-align:left;"> ${fn:toUpperCase(leader.lastName)}</td>
                             <td style="text-align:left;">${leader.totalWins}</td>
                             <td style="text-align:left;">${leader.predictedCount}</td>
-                            <td style="text-align:left;">0</td>
+                            <c:if test="${leader.prizeMoney == 0}">
+                                <td style="text-align:left;">-500</td>
+                            </c:if>
+                            <c:if test="${leader.prizeMoney != 0}">
+                                <td style="text-align:left;">${leader.prizeMoney}</td>
+                            </c:if>
                         </tr>
                     </c:if>
                 </table>
@@ -146,7 +150,12 @@
                                 <td style="text-align:left;"> ${fn:toUpperCase(leaderBoard.lastName)}</td>
                                 <td style="text-align:left;">${leaderBoard.totalWins}</td>
                                 <td style="text-align:left;">${leaderBoard.predictedCount}</td>
-                                <td style="text-align:left;">0</td>
+                                <c:if test="${leaderBoard.prizeMoney == 0}">
+                                    <td style="text-align:left;">-500</td>
+                                </c:if>
+                                <c:if test="${leaderBoard.prizeMoney != 0}">
+                                    <td style="text-align:left;">${leaderBoard.prizeMoney}</td>
+                                </c:if>
                             </tr>
                         </c:forEach>
                     </c:if>

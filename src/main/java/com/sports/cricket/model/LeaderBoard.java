@@ -24,6 +24,8 @@ public class LeaderBoard implements Serializable {
 
     private Integer predictedCount;
 
+    private Integer prizeMoney;
+
     public Integer getRank() {
         return rank;
     }
@@ -102,5 +104,13 @@ public class LeaderBoard implements Serializable {
 
     public void setPredictedCount(Integer predictedCount) {
         this.predictedCount = predictedCount;
+    }
+
+    public Integer getPrizeMoney() {
+        return prizeMoney;
+    }
+
+    public void setPrizeMoney(Integer prizeMoney) {
+        this.prizeMoney = prizeMoney;
     }
 }

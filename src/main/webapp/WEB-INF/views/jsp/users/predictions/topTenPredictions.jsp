@@ -108,15 +108,9 @@
                         <span style="display:flex;">
                         <input type="button" value="${fn:toUpperCase(schedulePrediction.schedule.homeTeam)} : ${schedulePrediction.homeTeamCount}" style=" margin: 0 auto;" class="btn btn-info">
                         <input type="button" value="${fn:toUpperCase(schedulePrediction.schedule.awayTeam)} : ${schedulePrediction.awayTeamCount}" style=" margin: 0 auto;" class="btn btn-primary">
-                        <input type="button" value="DEFAULT : ${schedulePrediction.notPredicted}" style=" margin: 0 auto;" class="btn btn-danger">
+                        <input type="button" value="Missed : ${schedulePrediction.notPredicted}" style=" margin: 0 auto;" class="btn btn-danger">
                         </span>
                         <br />
-                    </c:if>
-                    <c:if test="${schedulePrediction.deadlinReached}">
-                        <span style="display:flex;">
-                        <input type="button"  value="${fn:toUpperCase(schedulePrediction.schedule.homeTeam)} : ${schedulePrediction.homeWinAmount}" style=" margin: 0 auto;" class="btn btn-info">
-                        <input type="button"  value="${fn:toUpperCase(schedulePrediction.schedule.awayTeam)} : ${schedulePrediction.awayWinAmount}" style=" margin: 0 auto;" class="btn btn-primary">
-                        </span>
                     </c:if>
                     <br /><br />
                     <table class="w3-table w3-striped w3-white" style="text-align: center; align:center; align-content: center">
