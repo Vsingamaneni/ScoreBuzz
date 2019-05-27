@@ -105,7 +105,7 @@ public class ValidateDeadLine implements Serializable {
         return predictionList;
     }
 
-    public static List<Schedule> getScheduleList(List<Schedule> scheduleList, ScheduleService scheduleService) throws ParseException {
+    /*public static List<Schedule> getScheduleList(List<Schedule> scheduleList, ScheduleService scheduleService) throws ParseException {
 
         List<Schedule> timerSchedule = new ArrayList<>();
         int activeMatchDay = 0;
@@ -134,6 +134,6 @@ public class ValidateDeadLine implements Serializable {
         }
 
         return timerSchedule;
-    }
+    }*/
 
 }

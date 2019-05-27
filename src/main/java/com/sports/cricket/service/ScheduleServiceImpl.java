@@ -19,8 +19,8 @@ public class ScheduleServiceImpl implements ScheduleService, Serializable {
     }
 
     @Override
-    public List<Schedule> findAll() {
-        return scheduleDao.findAll();
+    public List<Schedule> findAll(String name) {
+        return scheduleDao.findAll(name);
     }
 
     @Override
@@ -29,8 +29,13 @@ public class ScheduleServiceImpl implements ScheduleService, Serializable {
     }
 
     @Override
-    public Schedule findById(Integer matchNumber) {
-        return scheduleDao.findById(matchNumber);
+    public List<Schedule> topTenScheduleList() {
+        return scheduleDao.topTenScheduleList();
+    }
+
+    @Override
+    public Schedule findById(Integer matchNumber,  String name) {
+        return scheduleDao.findById(matchNumber, name);
     }
 
     @Override
@@ -39,28 +44,33 @@ public class ScheduleServiceImpl implements ScheduleService, Serializable {
     }
 
     @Override
-    public boolean savePrediction(Prediction prediction) {
-        return scheduleDao.savePrediction(prediction);
+    public List<Prediction> findTopTenPredictions(Integer memberId) {
+        return scheduleDao.findTopTenPredictions(memberId);
     }
 
     @Override
-    public boolean updatePrediction(Prediction prediction) {
-        return scheduleDao.updatePrediction(prediction);
+    public boolean savePrediction(Prediction prediction, String name) {
+        return scheduleDao.savePrediction(prediction, name);
     }
 
     @Override
-    public Prediction getPrediction(Integer predictionId, Integer matchId) {
-        return scheduleDao.getPrediction(predictionId, matchId);
+    public boolean updatePrediction(Prediction prediction, String name) {
+        return scheduleDao.updatePrediction(prediction, name);
     }
 
     @Override
-    public Prediction getPrediction(Integer predictionId) {
-        return scheduleDao.getPrediction(predictionId);
+    public Prediction getPrediction(Integer predictionId, Integer matchId, String name) {
+        return scheduleDao.getPrediction(predictionId, matchId, name);
     }
 
     @Override
-    public boolean deletePrediction(Integer predictionId) {
-        return scheduleDao.deletePrediction(predictionId);
+    public Prediction getPrediction(Integer predictionId, String name) {
+        return scheduleDao.getPrediction(predictionId, name);
+    }
+
+    @Override
+    public boolean deletePrediction(Integer predictionId, String name) {
+        return scheduleDao.deletePrediction(predictionId, name);
     }
 
     @Override
@@ -74,8 +84,8 @@ public class ScheduleServiceImpl implements ScheduleService, Serializable {
     }
 
     @Override
-    public List<Prediction> getPredictionsByMatch(Integer matchId) {
-        return scheduleDao.getPredictionsByMatch(matchId);
+    public List<Prediction> getPredictionsByMatch(Integer matchId, String name) {
+        return scheduleDao.getPredictionsByMatch(matchId, name);
     }
 
     @Override
@@ -85,33 +95,33 @@ public class ScheduleServiceImpl implements ScheduleService, Serializable {
 
 
     @Override
-    public boolean updateMatchResult(Schedule schedule) {
-        return scheduleDao.updateMatchResult(schedule);
+    public boolean updateMatchResult(Schedule schedule, String name) {
+        return scheduleDao.updateMatchResult(schedule, name);
     }
 
     @Override
-    public Integer totalMatches(Integer matchDay) {
-        return scheduleDao.totalMatches(matchDay);
+    public Integer totalMatches(Integer matchDay, String name) {
+        return scheduleDao.totalMatches(matchDay, name);
     }
 
     @Override
-    public boolean updateMatchDay(Integer matchDay) {
-        return scheduleDao.updateMatchDay(matchDay);
+    public boolean updateMatchDay(Integer matchDay, String name) {
+        return scheduleDao.updateMatchDay(matchDay, name);
     }
 
     @Override
-    public boolean addResult(Result result) {
-        return scheduleDao.addResult(result);
+    public boolean addResult(Result result, String name) {
+        return scheduleDao.addResult(result, name);
     }
 
     @Override
-    public boolean insertPredictions(List<Standings> standingsList) {
-       return scheduleDao.insertPredictions(standingsList);
+    public boolean insertPredictions(List<Standings> standingsList, String name) {
+       return scheduleDao.insertPredictions(standingsList, name);
     }
 
     @Override
-    public List<Standings> getLeaderBoard() {
-        return scheduleDao.getLeaderBoard();
+    public List<Standings> getLeaderBoard(String name) {
+        return scheduleDao.getLeaderBoard(name);
     }
 
     @Override

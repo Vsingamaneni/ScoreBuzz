@@ -38,13 +38,12 @@
     <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i
             class="fa fa-bars"></i> &nbsp;Menu
     </button>
-    <span class="w3-bar-item w3-right">Score Finder</span>
+    <span class="w3-bar-item w3-right">Score Buzz</span>
 </div>
 
 <c:if test="${not empty session}">
     <c:set var="user_name" value="${session.firstName}"/>
     <c:set var="role" value="${session.role}"/>
-    <c:set var="isActivated" value="${}"/>
 </c:if>
 
 <c:if test="${empty session}">
@@ -74,20 +73,18 @@
     <div class="w3-bar-block">
         <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black"
            onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>&nbsp; Close Menu</a>
-        <c:if test="${session.choice.equalsIgnoreCase('Odds Per Game')}">
+        <c:if test="${session.choice.equalsIgnoreCase('1')}">
             <%@include file="navigation/gameodds.jsp" %>
         </c:if>
-        <c:if test="${session.choice.equalsIgnoreCase('Top Ten')}">
+        <c:if test="${session.choice.equalsIgnoreCase('2')}">
             <%@include file="navigation/topten.jsp" %>
         </c:if>
-        <c:if test="${session.choice.equalsIgnoreCase('Both')}">
+        <c:if test="${session.choice.equalsIgnoreCase('3')}">
             <%@include file="navigation/both.jsp" %>
         </c:if>
 
         <c:if test="${role.equalsIgnoreCase('admin')}">
-            <a href="/saveResult" class="w3-bar-item w3-button w3-padding"><i class="fa fa-legal"></i>&nbsp; Update
-                Result</a>
-
+            <%@include file="navigation/admin.jsp" %>
         </c:if>
         <a href="/logout" class="w3-bar-item w3-button w3-padding"><i class="fa fa-power-off"></i>&nbsp; Logout</a>
     </div>
@@ -99,7 +96,7 @@
 <!-- !PAGE CONTENT! -->
 <div class="w3-main" style="margin-left:300px;margin-top:43px;">
 
-    <h2> &nbsp;&nbsp; Hey ${fn:toUpperCase(user_name)}, Update match result. </h2>
+    <h2 style="text-align: center;"> Hey ${fn:toUpperCase(user_name)}, Update match result. </h2>
 
     <c:if test="${not empty msg}">
     <div class="alert alert-${css} alert-dismissible" role="alert">
@@ -139,7 +136,7 @@
                                 </tr>
                                 </thead>
                                 <tr style="color:black;font-size:20px;text-decoration:none;font-family:Comic Sans MS">
-                                    <form action="/matchResult/update/" modelAttribute="schedule" method="POST"
+                                    <form action="/matchResult/update/${type}" modelAttribute="schedule" method="POST"
                                           class='form-horizontal' role='form'>
                                         <td style="text-align:left;"> ${schedule.matchNumber}</td>
                                         <td style="text-align:left;">${fn:toUpperCase(schedule.homeTeam)}

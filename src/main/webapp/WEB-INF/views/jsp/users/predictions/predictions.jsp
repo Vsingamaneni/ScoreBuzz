@@ -33,13 +33,13 @@
 <!-- Top container -->
 <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
     <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i> &nbsp;Menu</button>
-    <span class="w3-bar-item w3-right">Score Finder</span>
+    <span class="w3-bar-item w3-right">Score Buzz</span>
 </div>
 
 <c:if test="${not empty session}">
     <c:set var="user_name" value="${session.firstName}"/>
     <c:set var="role" value="${session.role}"/>
-    <c:set var="isActivated" value="${}"/>
+    <c:set var="choice" value="1"/>
 </c:if>
 
 <c:if test="${empty session}">
@@ -66,20 +66,18 @@
     <div class="w3-bar-block">
         <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black"
            onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>&nbsp; Close Menu</a>
-        <c:if test="${session.choice.equalsIgnoreCase('Odds Per Game')}">
-            <%@include file="navigation/gameodds.jsp" %>
+        <c:if test="${session.choice.equalsIgnoreCase('1')}">
+            <%@include file="../navigation/gameodds.jsp" %>
         </c:if>
-        <c:if test="${session.choice.equalsIgnoreCase('Top Ten')}">
-            <%@include file="navigation/topten.jsp" %>
+        <c:if test="${session.choice.equalsIgnoreCase('2')}">
+            <%@include file="../navigation/topten.jsp" %>
         </c:if>
-        <c:if test="${session.choice.equalsIgnoreCase('Both')}">
-            <%@include file="navigation/both.jsp" %>
+        <c:if test="${session.choice.equalsIgnoreCase('3')}">
+            <%@include file="../navigation/both.jsp" %>
         </c:if>
 
         <c:if test="${role.equalsIgnoreCase('admin')}">
-            <a href="/saveResult" class="w3-bar-item w3-button w3-padding"><i class="fa fa-legal"></i>&nbsp; Update
-                Result</a>
-
+            <%@include file="../navigation/admin.jsp" %>
         </c:if>
         <a href="/logout" class="w3-bar-item w3-button w3-padding"><i class="fa fa-power-off"></i>&nbsp; Logout</a>
     </div>
@@ -90,21 +88,7 @@
 <!-- !PAGE CONTENT! -->
 <div class="w3-main" style="margin-left:300px;margin-top:43px;">
 
-
-
-    <c:if test="${isActivated.equalsIgnoreCase('N')}">
-        <div class="w3-row-padding w3-margin-bottom">
-            <div class="w3-container w3-red w3-padding-16">
-                <div class="w3-left"><i class="fa fa-comment w3-xxxlarge"></i></div>
-                <div class="w3-right">
-                </div>
-                <div class="w3-clear"></div>
-                <h4>Hello ${user_name}, You need to be active in order to predict for matches. !! Please contact the admin !</h4>
-            </div>
-        </div>
-        <br>
-    </c:if>
-
+    <br />
     <h2 style="text-align: center;"> &nbsp;&nbsp; Hey ${fn:toUpperCase(user_name)}, your match day predictions are below. </h2>
 
     <c:if test="${not empty msg}">
@@ -137,8 +121,8 @@
                                     <td>${fn:toUpperCase(prediction.selected)}</td>
                                     <td>${fn:toUpperCase(prediction.predictedTime)}</td>
                                     <td>
-                                    <spring:url value="/prediction/${prediction.predictionId}/${prediction.matchNumber}/update" var="updateUrl" />
-                                    <spring:url value="/prediction/${prediction.predictionId}/delete" var="deleteUrl" />
+                                    <spring:url value="/prediction/${prediction.predictionId}/${prediction.matchNumber}/update/${choice}" var="updateUrl" />
+                                    <spring:url value="/prediction/${prediction.predictionId}/delete/${choice}" var="deleteUrl" />
 
                                     <c:if test="${prediction.canPredict}">
                                         <button class="btn btn-primary" onclick="location.href='${updateUrl}'">Update</button>
@@ -174,7 +158,7 @@
                                 <td style="text-align:left;">${schedule.homeTeam} vs ${schedule.awayTeam}</td>
                                 <td style="text-align:left;">${schedule.deadline}</td>
                                 <td style="text-align:left;">
-                                    <spring:url value="/match/${session.memberId}/${schedule.matchNumber}/predict" var="predictUrl" />
+                                    <spring:url value="/match/${session.memberId}/${schedule.matchNumber}/predict/${choice}" var="predictUrl" />
                                     <c:if test="${session.isActive.equalsIgnoreCase('Y')}">
                                     <c:if test="${schedule.canPredict}">
                                     <button class="btn btn-primary" onclick="location.href='${predictUrl}'">Predict</button>

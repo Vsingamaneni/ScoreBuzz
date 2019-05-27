@@ -143,7 +143,7 @@ public class UserController implements Serializable {
             return "redirect:/";
         } else {
             httpSession.setMaxInactiveInterval(10 * 60);
-            List<Standings> standingsList = scheduleService.getLeaderBoard();
+            List<Standings> standingsList = scheduleService.getLeaderBoard("STANDINGS");
             List<Restrictions> restrictions = registrationService.getRestrictions();
 
             userLogin.setLimitReached(LeaderBoardDetails.isLimitReached(standingsList, userLogin.getMemberId(), restrictions.get(0).getMaxLimit()));
@@ -234,6 +234,7 @@ public class UserController implements Serializable {
             return "redirect:/register";
         }
 
+        RegisterUserUtil.setChoice(register);
         boolean success = registrationService.registerUser(register);
 
         if (success) {
@@ -462,7 +463,47 @@ public class UserController implements Serializable {
             model.addAttribute("schedules", finalSchedule);
 
             httpSession.setMaxInactiveInterval(5 * 60);
-            return "users/predictions";
+            return "users/predictions/predictions";
+        }
+    }
+
+    // Display predictions
+    @RequestMapping(value = "/topTenPredictions", method = RequestMethod.GET)
+    public String showTopTenPredictions(ModelMap model, HttpSession httpSession) throws ParseException {
+
+        UserLogin userLogin = (UserLogin) httpSession.getAttribute("session");
+
+
+        if (null == userLogin) {
+            return "redirect:/";
+        } else {
+            model.addAttribute("session", userLogin);
+            httpSession.setAttribute("user", userLogin.getFirstName());
+            httpSession.setAttribute("role", userLogin.getRole());
+            httpSession.setAttribute("session", userLogin);
+
+            Register register = registrationService.getUser(userLogin.getEmail());
+
+            userLogin.setIsActive(register.getIsActive());
+
+            if (null !=  httpSession.getAttribute("msg")){
+                model.addAttribute("msg", httpSession.getAttribute("msg"));
+                httpSession.removeAttribute("msg");
+            }
+
+            List<Schedule> schedules = ValidatePredictions.validateSchedule(scheduleService.topTenScheduleList());
+            List<Prediction> predictions = scheduleService.findTopTenPredictions(userLogin.getMemberId());
+            schedules = ValidatePredictions.isScheduleAfterRegistration(schedules, register.getRegisteredTime());
+            List<Schedule> finalSchedule = ValidatePredictions.validatePrediction(schedules, predictions);
+            predictions = ValidateDeadLine.mapScheduleToPredictions(schedules, predictions);
+            int matchDay = ScheduleValidation.getMatchDay(schedules);
+            predictions = ScheduleValidation.setCurrentMatchDayPredictions(predictions, matchDay);
+
+            model.addAttribute("predictions", predictions);
+            model.addAttribute("schedules", finalSchedule);
+
+            httpSession.setMaxInactiveInterval(5 * 60);
+            return "users/predictions/predictions_board";
         }
     }
 
@@ -587,8 +628,8 @@ public class UserController implements Serializable {
     }
 
     // show update form
-    @RequestMapping(value = "/match/{memberId}/{matchNumber}/predict", method = RequestMethod.GET)
-    public String predictMatch(@PathVariable("memberId") Integer memberId, @PathVariable("matchNumber") Integer matchNumber, Model model, HttpSession httpSession) throws ParseException {
+    @RequestMapping(value = "/match/{memberId}/{matchNumber}/predict/{type}", method = RequestMethod.GET)
+    public String predictMatch(@PathVariable("memberId") Integer memberId, @PathVariable("matchNumber") Integer matchNumber, @PathVariable("type") String type, Model model, HttpSession httpSession) throws ParseException {
 
         logger.debug("predictMatch() : {}", memberId, matchNumber);
 
@@ -597,26 +638,32 @@ public class UserController implements Serializable {
         if (null == userLogin) {
             return "redirect:/";
         } else {
-
             if (null != httpSession.getAttribute("errorDetailsList")) {
                 List<ErrorDetails> errorDetailsList = (List<ErrorDetails>) httpSession.getAttribute("errorDetailsList");
                 model.addAttribute("errorDetailsList", errorDetailsList);
                 httpSession.removeAttribute("errorDetailsList");
             }
 
-            Schedule schedule = scheduleService.findById(matchNumber);
+            Schedule schedule;
+            if (type.equalsIgnoreCase("1")) {
+                schedule = scheduleService.findById(matchNumber, "SCHEDULE");
+            } else {
+                schedule = scheduleService.findById(matchNumber, "TOP_SCHEDULE");
+            }
+
             if (ValidateDeadline.isDeadLineReached(schedule.getStartDate())){
                 httpSession.setAttribute("msg", "Prediction deadline is reached, cannot predict/update");
                 return "redirect:/predictions";
             }
 
             Prediction prediction = new Prediction();
+            prediction.setChoice(type);
 
             model.addAttribute("scheduleForm", schedule);
             model.addAttribute("predictionForm", prediction);
             model.addAttribute("session", userLogin);
 
-            return "users/user_prediction";
+            return "users/predictions/user_prediction";
         }
     }
 
@@ -635,10 +682,16 @@ public class UserController implements Serializable {
             List<ErrorDetails> errorDetailsList = ResultValidator.isValid(prediction);
             if (errorDetailsList.size() > 0) {
                 httpSession.setAttribute("errorDetailsList", errorDetailsList);
-                return "redirect:/match/" + prediction.getMemberId() + "/" + prediction.getMatchNumber() + "/predict";
+                return "redirect:/match/" + prediction.getMemberId() + "/" + prediction.getMatchNumber() + "/predict/"+prediction.getChoice() +"/";
             }
-
-            boolean savePrediction = scheduleService.savePrediction(prediction);
+            boolean savePrediction = false;
+            if (prediction.getChoice() != null) {
+                if (prediction.getChoice().equalsIgnoreCase("1")) {
+                    savePrediction = scheduleService.savePrediction(prediction, "PREDICTIONS");
+                } else if (prediction.getChoice().equalsIgnoreCase("2")){
+                    savePrediction = scheduleService.savePrediction(prediction, "TOP_PREDICTIONS");
+                }
+            }
 
             //Prediction prediction = new Prediction();
 
@@ -648,13 +701,17 @@ public class UserController implements Serializable {
             model.addAttribute("msg" , "Your Prediction for " + prediction.getHomeTeam() + " vs " + prediction.getAwayTeam() + " is Saved Successfully!!");
             httpSession.setAttribute("msg", "Your Prediction for " + prediction.getHomeTeam() + " vs " + prediction.getAwayTeam() + " is Saved Successfully!!");
 
-            return "redirect:/predictions";
+            if (prediction.getChoice().equalsIgnoreCase("1")) {
+                return "redirect:/predictions";
+            } else {
+                return "redirect:/topTenPredictions";
+            }
         }
     }
 
     // Update prediction form
-    @RequestMapping(value = "/prediction/{memberId}/{matchNumber}/update", method = RequestMethod.GET)
-    public String updatePrediction(@PathVariable("memberId") Integer memberId, @PathVariable("matchNumber") Integer matchNumber, Model model, HttpSession httpSession) throws ParseException {
+    @RequestMapping(value = "/prediction/{memberId}/{matchNumber}/update/{type}", method = RequestMethod.GET)
+    public String updatePrediction(@PathVariable("memberId") Integer memberId, @PathVariable("matchNumber") Integer matchNumber, @PathVariable("type") String type, Model model, HttpSession httpSession) throws ParseException {
 
         logger.debug("updatePrediction() : {}", memberId, matchNumber);
 
@@ -670,14 +727,26 @@ public class UserController implements Serializable {
             return "redirect:/";
         }
 
-        Schedule schedule = scheduleService.findById(matchNumber);
+        Schedule schedule;
+        if (type.equalsIgnoreCase("1")) {
+             schedule = scheduleService.findById(matchNumber, "SCHEDULE");
+        } else {
+            schedule = scheduleService.findById(matchNumber, "TOP_SCHEDULE");
+        }
+
         if (ValidateDeadline.isDeadLineReached(schedule.getStartDate())){
             httpSession.setAttribute("msg", "Prediction deadline is reached, cannot predict/update");
             return "redirect:/predictions";
         }
-        Prediction prediction = scheduleService.getPrediction(memberId, matchNumber);
 
+        Prediction prediction;
+        if (type.equalsIgnoreCase("1")) {
+            prediction = scheduleService.getPrediction(memberId, matchNumber, "PREDICTIONS");
+        } else {
+            prediction = scheduleService.getPrediction(memberId, matchNumber, "TOP_PREDICTIONS");
+        }
 
+        prediction.setChoice(type);
         model.addAttribute("scheduleForm", schedule);
         model.addAttribute("predictionForm", prediction);
         model.addAttribute("session", userLogin);
@@ -698,10 +767,15 @@ public class UserController implements Serializable {
                 && errorDetailsList.size() > 0) {
             model.addAttribute("errorDetailsList", errorDetailsList);
             httpSession.setAttribute("errorDetailsList", errorDetailsList);
-            return "redirect:/prediction/{memberId}/{matchNumber}/update";
+            return "redirect:/prediction/{memberId}/{matchNumber}/update/"+prediction.getChoice()+"/";
         }
 
-        boolean savePrediction = scheduleService.updatePrediction(prediction);
+        boolean savePrediction;
+        if (prediction.getChoice().equalsIgnoreCase("1")) {
+            savePrediction = scheduleService.updatePrediction(prediction, "PREDICTIONS");
+        } else {
+            savePrediction = scheduleService.updatePrediction(prediction, "TOP_PREDICTIONS");
+        }
 
         model.addAttribute("isPredictionSuccess", savePrediction);
         model.addAttribute("session", httpSession.getAttribute("session"));
@@ -714,8 +788,8 @@ public class UserController implements Serializable {
     }
 
     // show delete form
-    @RequestMapping(value = "/prediction/{predictionID}/delete", method = RequestMethod.GET)
-    public String showDeletePrediction(@PathVariable("predictionID") Integer predictionId, Model model, HttpSession httpSession) {
+    @RequestMapping(value = "/prediction/{predictionID}/delete/{type}", method = RequestMethod.GET)
+    public String showDeletePrediction(@PathVariable("predictionID") Integer predictionId, @PathVariable("type") String type, Model model, HttpSession httpSession) {
 
         logger.debug("show Delete Form() : {}", predictionId);
 
@@ -725,18 +799,24 @@ public class UserController implements Serializable {
             return "redirect:/";
         } else {
 
-            Prediction prediction = scheduleService.getPrediction(predictionId);
+            Prediction prediction;
+            if (type.equalsIgnoreCase("1")) {
+                prediction = scheduleService.getPrediction(predictionId, "PREDICTIONS");
+            } else {
+                prediction = scheduleService.getPrediction(predictionId, "TOP_PREDICTIONS");
+            }
 
+            prediction.setChoice(type);
             model.addAttribute("session", userLogin);
             model.addAttribute("predictionForm", prediction);
 
-            return "users/confirm_delete";
+            return "users/predictions/confirm_delete";
         }
     }
 
     // confirm delete form
-    @RequestMapping(value = "/prediction/{predictionId}/delete", method = RequestMethod.POST)
-    public String deletePrediction(@PathVariable("predictionId") Integer predictionId, Model model, HttpSession httpSession) {
+    @RequestMapping(value = "/prediction/{predictionId}/delete/{type}", method = RequestMethod.POST)
+    public String deletePrediction(@PathVariable("predictionId") Integer predictionId, @PathVariable("type") String type, Model model, HttpSession httpSession) {
 
         logger.debug("delete Prediction() : {}", predictionId);
 
@@ -745,7 +825,13 @@ public class UserController implements Serializable {
         if (null == userLogin) {
             return "redirect:/";
         } else {
-            boolean isDeleteSuccess = scheduleService.deletePrediction(predictionId);
+
+            boolean isDeleteSuccess;
+            if (type.equalsIgnoreCase("1")) {
+                isDeleteSuccess = scheduleService.deletePrediction(predictionId, "PREDICTIONS");
+            }else {
+                isDeleteSuccess = scheduleService.deletePrediction(predictionId, "TOP_PREDICTIONS");
+            }
 
             model.addAttribute("isDeleteSuccess", isDeleteSuccess);
             model.addAttribute("session", httpSession.getAttribute("session"));
@@ -756,55 +842,51 @@ public class UserController implements Serializable {
     }
 
     // Save Result
-    @RequestMapping(value = "/saveResult", method = RequestMethod.GET)
-    public String saveResult(ModelMap model, HttpSession httpSession){
+    @RequestMapping(value = "/saveResult/{type}", method = RequestMethod.GET)
+    public String saveResult(@PathVariable("type") String type, ModelMap model, HttpSession httpSession) {
 
         logger.debug("saveResult() : {}");
 
         UserLogin userLogin = (UserLogin) httpSession.getAttribute("session");
 
-        if (null == userLogin) {
-            return "redirect:/";
-        } else {
-
-            if (null != model.get("msg")) {
-                model.remove("msg");
-            }
-
-            String value = (String) httpSession.getAttribute("msg");
-            if (null != value) {
-                model.addAttribute("msg", value);
-                httpSession.removeAttribute("msg");
-            }
-            Schedule schedule = new Schedule();
-            httpSession.setAttribute("login", userLogin);
-            httpSession.setAttribute("user", userLogin.getFirstName());
-            httpSession.setAttribute("role", userLogin.getRole());
-            httpSession.setAttribute("session", userLogin);
-            model.addAttribute("schedule", schedule);
-            model.addAttribute("session", userLogin);
-
-            if (userLogin.getRole().equalsIgnoreCase("admin")) {
-
-                List<Schedule> schedules = scheduleService.findAll();
-
-                model.addAttribute("schedules", schedules);
-                if (null != httpSession.getAttribute("errorDetailsList")) {
-                    List<ErrorDetails> errorDetailsList = (List<ErrorDetails>) httpSession.getAttribute("errorDetailsList");
-                    model.addAttribute("errorDetailsList", errorDetailsList);
-                    httpSession.removeAttribute("errorDetailsList");
-                }
-
-                httpSession.setMaxInactiveInterval(5 * 60);
-                return "users/updateResult";
-            } else {
-                return "redirect:/predictions";
-            }
+        if (null != model.get("msg")) {
+            model.remove("msg");
         }
+
+        String value = (String) httpSession.getAttribute("msg");
+        if (null != value) {
+            model.addAttribute("msg", value);
+            httpSession.removeAttribute("msg");
+        }
+        Schedule schedule = new Schedule();
+        httpSession.setAttribute("login", userLogin);
+        httpSession.setAttribute("user", userLogin.getFirstName());
+        httpSession.setAttribute("role", userLogin.getRole());
+        httpSession.setAttribute("session", userLogin);
+        model.addAttribute("schedule", schedule);
+        model.addAttribute("session", userLogin);
+
+        List<Schedule> schedules;
+        if (type.equalsIgnoreCase("1")) {
+            schedules = scheduleService.findAll("SCHEDULE");
+        } else {
+            schedules = scheduleService.findAll("TOP_SCHEDULE");
+        }
+
+        model.addAttribute("schedules", schedules);
+        model.addAttribute("type", type);
+        if (null != httpSession.getAttribute("errorDetailsList")) {
+            List<ErrorDetails> errorDetailsList = (List<ErrorDetails>) httpSession.getAttribute("errorDetailsList");
+            model.addAttribute("errorDetailsList", errorDetailsList);
+            httpSession.removeAttribute("errorDetailsList");
+        }
+
+        httpSession.setMaxInactiveInterval(5 * 60);
+        return "users/updateResult";
     }
 
-    @RequestMapping(value = "/matchResult/update", method = RequestMethod.POST)
-    public String updateMatchResult(@ModelAttribute("schedule") Schedule schedule, ModelMap model, HttpSession httpSession) throws ParseException {
+    @RequestMapping(value = "/matchResult/update/{type}", method = RequestMethod.POST)
+    public String updateMatchResult(@PathVariable("type") String type, @ModelAttribute("schedule") Schedule schedule, ModelMap model, HttpSession httpSession) {
 
         UserLogin userLogin = (UserLogin) httpSession.getAttribute("session");
         if (null != model.get("msg")) {
@@ -833,26 +915,50 @@ public class UserController implements Serializable {
             boolean isUpdateSuccess = false;
             boolean isUpdateResultSuccess = false;
 
-            if (null != schedule
-                    && null != schedule.getWinner()) {
-                List<ErrorDetails> errorDetailsList = ResultValidator.isMatchResultValid(schedule);
-                if (errorDetailsList.size() > 0 ){
-                    httpSession.setAttribute("errorDetailsList" , errorDetailsList);
-                    return "redirect:/saveResult";
+            if (type.equalsIgnoreCase("1")) {
+                if (null != schedule
+                        && null != schedule.getWinner()) {
+                    List<ErrorDetails> errorDetailsList = ResultValidator.isMatchResultValid(schedule);
+                    if (errorDetailsList.size() > 0) {
+                        httpSession.setAttribute("errorDetailsList", errorDetailsList);
+                        return "redirect:/saveResult/{type}";
+                    }
+                    Integer totalMatches = scheduleService.totalMatches(schedule.getMatchDay(), "SCHEDULE");
+                    isUpdateSuccess = scheduleService.updateMatchResult(schedule, "SCHEDULE");
+                    SchedulePrediction schedulePrediction = MatchUpdates.setUpdates(schedule, scheduleService, registrationService, "PREDICTIONS");
+                    Result result = MatchUpdates.mapResult(schedule, schedulePrediction);
+
+                    isUpdateResultSuccess = scheduleService.addResult(result, "RESULTS");
+
+                    List<Standings> standingsList = MatchUpdates.updateStandings(schedulePrediction);
+
+                    scheduleService.insertPredictions(standingsList, "STANDINGS");
+
+                    if (totalMatches == 1) {
+                        scheduleService.updateMatchDay(schedule.getMatchDay() + 1, "SCHEDULE");
+                    }
                 }
-                Integer totalMatches = scheduleService.totalMatches(schedule.getMatchDay());
-                isUpdateSuccess = scheduleService.updateMatchResult(schedule);
-                SchedulePrediction schedulePrediction = MatchUpdates.setUpdates(schedule, scheduleService, registrationService);
-                Result result = MatchUpdates.mapResult(schedule, schedulePrediction);
+            } else {
+                if (null != schedule && null != schedule.getWinner()) {
+                    List<ErrorDetails> errors = ResultValidator.isMatchResultValid(schedule);
+                    if (errors.size() > 0) {
+                        httpSession.setAttribute("errorDetailsList", errors);
+                        return "redirect:/saveResult/{type}";
+                    }
+                    Integer totalMatches = scheduleService.totalMatches(schedule.getMatchDay(), "TOP_SCHEDULE");
+                    isUpdateSuccess = scheduleService.updateMatchResult(schedule, "TOP_SCHEDULE");
+                    SchedulePrediction schedulePrediction = MatchUpdates.setUpdates(schedule, scheduleService, registrationService, "TOP_PREDICTIONS");
+                    Result result = MatchUpdates.mapResult(schedule, schedulePrediction);
 
-                isUpdateResultSuccess = scheduleService.addResult(result);
+                    isUpdateResultSuccess = scheduleService.addResult(result, "TOP_RESULTS");
 
-                List<Standings> standingsList = MatchUpdates.updateStandings(schedulePrediction);
+                    List<Standings> standingsList = MatchUpdates.updateStandings(schedulePrediction);
 
-                scheduleService.insertPredictions(standingsList);
+                    scheduleService.insertPredictions(standingsList, "TOP_STANDINGS");
 
-                if (totalMatches == 1) {
-                    scheduleService.updateMatchDay(schedule.getMatchDay() + 1);
+                    if (totalMatches == 1) {
+                        scheduleService.updateMatchDay(schedule.getMatchDay() + 1, "TOP_SCHEDULE");
+                    }
                 }
             }
 
@@ -861,7 +967,7 @@ public class UserController implements Serializable {
             }
 
             httpSession.setMaxInactiveInterval(5 * 60);
-            return "redirect:/saveResult";
+            return "redirect:/saveResult/{type}";
         }
     }
 
@@ -880,13 +986,13 @@ public class UserController implements Serializable {
         model.addAttribute("login", userLogin);
         model.addAttribute("userLogin", userLogin);
 
-        List<Schedule> currentSchedule = ValidatePredictions.validateSchedule(scheduleService.findAll());
+        List<Schedule> currentSchedule = ValidatePredictions.validateSchedule(scheduleService.findAll("SCHEDULE"));
         boolean isScheduleDone = false;
 
         List<SchedulePrediction> schedulePredictionsList = new ArrayList<>();
         for (Schedule schedule : currentSchedule) {
             if(ValidateDeadline.isDeadLineReached(schedule.getStartDate()) || userLogin.getRole().equalsIgnoreCase("admin")){
-                SchedulePrediction matchDetails = MatchUpdates.setUpdates(schedule, scheduleService, registrationService);
+                SchedulePrediction matchDetails = MatchUpdates.setUpdates(schedule, scheduleService, registrationService, "PREDICTIONS");
                 ValidateDeadLine.isUpdatePossible(matchDetails.getSchedule(), matchDetails.getPrediction());
                 List<Prediction> predictionList = PredictionListMapper.sortPredictions(matchDetails.getPrediction());
                 matchDetails.setPrediction(predictionList);
@@ -896,17 +1002,50 @@ public class UserController implements Serializable {
         }
 
         if (!isScheduleDone) {
-            List<Prediction> adminPredictions = PredictionListMapper.adminPredictions(registrationService, scheduleService);
+            List<Prediction> adminPredictions = PredictionListMapper.adminPredictions(registrationService, scheduleService, "SCHEDULE");
             model.addAttribute("adminPredictions", adminPredictions);
             model.addAttribute("deadLineSchedule", currentSchedule);
         }
 
         model.addAttribute("schedulePredictions", schedulePredictionsList);
 
-        return "users/currentPredictions";
+        return "users/predictions/currentPredictions";
     }
 
-    // Display Settlement
+    // Show Current Predictions
+    @RequestMapping(value = "/showTopTenPredictions", method = RequestMethod.GET)
+    public String showTopTenPredictions(Model model, HttpSession httpSession) throws ParseException {
+
+        logger.debug("showTopTenPredictions()");
+
+        UserLogin userLogin = (UserLogin) httpSession.getAttribute("session");
+        if (null == userLogin){
+            return "redirect:/";
+        }
+
+        model.addAttribute("session", userLogin);
+        model.addAttribute("login", userLogin);
+        model.addAttribute("userLogin", userLogin);
+
+        List<Schedule> currentSchedule = ValidatePredictions.validateSchedule(scheduleService.findAll("TOP_SCHEDULE"));
+
+        List<SchedulePrediction> schedulePredictionsList = new ArrayList<>();
+        for (Schedule schedule : currentSchedule) {
+                SchedulePrediction matchDetails = MatchUpdates.setUpdates(schedule, scheduleService, registrationService, "TOP_PREDICTIONS");
+                ValidateDeadLine.isUpdatePossible(matchDetails.getSchedule(), matchDetails.getPrediction());
+                List<Prediction> predictionList = PredictionListMapper.sortPredictions(matchDetails.getPrediction());
+                matchDetails.setPrediction(predictionList);
+                schedulePredictionsList.add(matchDetails);
+            List<Prediction> adminPredictions = PredictionListMapper.adminPredictions(registrationService, scheduleService, "TOP_SCHEDULE");
+            model.addAttribute("adminPredictions", adminPredictions);
+            model.addAttribute("deadLineSchedule", currentSchedule);
+            model.addAttribute("schedulePredictions", schedulePredictionsList);
+            }
+
+        return "users/predictions/topTenPredictions";
+    }
+
+    // Display Standings
     @RequestMapping(value = "/standings", method = RequestMethod.GET)
     public String standings(ModelMap model, HttpSession httpSession) {
 
@@ -931,7 +1070,8 @@ public class UserController implements Serializable {
             Register register = registrationService.getUser(userLogin.getEmail());
 
             List<Register> registerList = registrationService.getAllUsers();
-            List<Standings> standingsList = scheduleService.getLeaderBoard();
+            registerList = MatchUpdates.getCurrentUsers(registerList, "PREDICTIONS");
+            List<Standings> standingsList = scheduleService.getLeaderBoard("STANDINGS");
 
             List<LeaderBoard> leaderBoardList = LeaderBoardDetails.mapLeaderBoard(standingsList, registerList);
 
@@ -940,7 +1080,47 @@ public class UserController implements Serializable {
             model.addAttribute("leader", leaderBoard);
 
             httpSession.setMaxInactiveInterval(5 * 60);
-            return "users/leaderboard";
+            return "users/dashboards/leaderboard";
+        }
+    }
+
+    // Display Top ten standings
+    @RequestMapping(value = "/topTenStandings", method = RequestMethod.GET)
+    public String topTenStandings(ModelMap model, HttpSession httpSession) {
+
+        UserLogin userLogin = (UserLogin) httpSession.getAttribute("session");
+        if (null != model.get("msg")) {
+            model.remove("msg");
+        }
+
+        if (null == userLogin) {
+            return "redirect:/";
+        } else {
+            model.addAttribute("session", userLogin);
+
+            String value = (String) httpSession.getAttribute("msg");
+
+            if (null != value) {
+                model.addAttribute("msg", value);
+            }
+            httpSession.removeAttribute("msg");
+            httpSession.setAttribute("session", userLogin);
+
+            Register register = registrationService.getUser(userLogin.getEmail());
+
+            List<Register> registerList = registrationService.getAllUsers();
+            registerList = MatchUpdates.getCurrentUsers(registerList, "TOP_PREDICTIONS");
+
+            List<Standings> standingsList = scheduleService.getLeaderBoard("TOP_STANDINGS");
+
+            List<LeaderBoard> leaderBoardList = LeaderBoardDetails.mapTopTenLeaderBoard(standingsList, registerList);
+
+            model.addAttribute("leaderBoardList", leaderBoardList);
+            LeaderBoard leaderBoard = LeaderBoardDetails.getCurrentUserStandings(leaderBoardList, register.getMemberId());
+            model.addAttribute("leader", leaderBoard);
+
+            httpSession.setMaxInactiveInterval(5 * 60);
+            return "users/dashboards/topTenLeaderBoard";
         }
     }
 
@@ -1087,7 +1267,7 @@ public class UserController implements Serializable {
             Register register = registrationService.getUser(login.getEmail());
 
             List<Register> registerList = registrationService.getAllUsers();
-            List<Standings> standingsList = scheduleService.getLeaderBoard();
+            List<Standings> standingsList = scheduleService.getLeaderBoard("STANDINGS");
 
             // get the Users based on the default count
             List<StatsDetails> defaultLists = StatisticsDetails.getDefaults(standingsList, registerList);
@@ -1122,13 +1302,13 @@ public class UserController implements Serializable {
             model.addAttribute("userStats", userStats);
 
             httpSession.setMaxInactiveInterval(5 * 60);
-            return "users/stats";
+            return "users/dashboards/stats";
         }
     }
 
     // Display predictions
-    @RequestMapping(value = "/history", method = RequestMethod.GET)
-    public String showHistory(ModelMap model, HttpSession httpSession) {
+    @RequestMapping(value = "/history/{type}", method = RequestMethod.GET)
+    public String showHistory(@PathVariable("type") String type, ModelMap model, HttpSession httpSession) {
 
         UserLogin userLogin = (UserLogin) httpSession.getAttribute("session");
         if (null != model.get("msg")) {
@@ -1149,14 +1329,27 @@ public class UserController implements Serializable {
 
             Register register = registrationService.getUser(userLogin.getEmail());
 
-            List<Standings> standingsList = LeaderBoardDetails.getStandings(scheduleService.getLeaderBoard(), register.getMemberId());
-            standingsList = MatchUpdates.mapStandings(standingsList);
+            List<Standings> standingsList;
+            if (type.equalsIgnoreCase("1")) {
+                standingsList = LeaderBoardDetails.getStandings(scheduleService.getLeaderBoard("STANDINGS"), register.getMemberId());
+                standingsList = MatchUpdates.mapStandings(standingsList, false);
+                standingsList = LeaderBoardDetails.setResults(standingsList);
+                model.addAttribute("standingsList", standingsList);
 
-            standingsList = LeaderBoardDetails.setResults(standingsList);
-            model.addAttribute("standingsList", standingsList);
+                httpSession.setMaxInactiveInterval(5 * 60);
+                return "users/dashboards/history";
+            } else {
+                standingsList = LeaderBoardDetails.getStandings(scheduleService.getLeaderBoard("TOP_STANDINGS"), register.getMemberId());
+                standingsList = MatchUpdates.mapStandings(standingsList, true);
 
-            httpSession.setMaxInactiveInterval(5 * 60);
-            return "users/history";
+                standingsList = LeaderBoardDetails.setResults(standingsList);
+                model.addAttribute("standingsList", standingsList);
+
+                httpSession.setMaxInactiveInterval(5 * 60);
+                return "users/dashboards/toptenhistory";
+            }
+
+
         }
     }
 

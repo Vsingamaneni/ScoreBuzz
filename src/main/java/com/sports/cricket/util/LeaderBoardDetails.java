@@ -146,4 +146,39 @@ public class LeaderBoardDetails implements Serializable {
         return null;
     }
 
+    public static List<LeaderBoard>  mapTopTenLeaderBoard(List<Standings> standingsList, List<Register> registerList) {
+        List<LeaderBoard> leaderBoardList = new ArrayList<>();
+        LeaderBoard leaderBoard;
+        if (!CollectionUtils.isEmpty(standingsList)) {
+            for (Register register : registerList) {
+                leaderBoard = new LeaderBoard();
+                leaderBoard.setMemberId(register.getMemberId());
+                leaderBoard.setFirstName(register.getfName());
+                leaderBoard.setLastName(register.getlName());
+
+                int count = 0;
+                int predictedCount = 0;
+                for (Standings standings : standingsList) {
+                    if (register.getMemberId() != standings.getMemberId()) {
+                        continue;
+                    }
+                    if (standings.getSelected().equalsIgnoreCase(standings.getWinner())
+                            && !standings.getWinner().equalsIgnoreCase("draw")){
+                        count = count+1;
+                        predictedCount = predictedCount + standings.getPredictedCount();
+                    }
+                }
+                leaderBoard.setTotalWins(count);
+                leaderBoard.setPredictedCount(predictedCount);
+                leaderBoardList.add(leaderBoard);
+            }
+        }
+
+        Comparator.comparing((LeaderBoard p)->p.getTotalWins())
+                .thenComparingInt(p->p.getPredictedCount())
+                .thenComparing(p->p.getFirstName());
+
+        return leaderBoardList;
+    }
+
 }

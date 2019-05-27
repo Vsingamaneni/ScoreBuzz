@@ -24,6 +24,8 @@ public class Prediction implements Serializable {
 
     private Integer matchDay;
 
+    private String choice;
+
     public Integer getPredictionId() {
         return predictionId;
     }
@@ -102,5 +104,13 @@ public class Prediction implements Serializable {
 
     public void setMatchDay(Integer matchDay) {
         this.matchDay = matchDay;
+    }
+
+    public String getChoice() {
+        return choice;
+    }
+
+    public void setChoice(String choice) {
+        this.choice = choice;
     }
 }

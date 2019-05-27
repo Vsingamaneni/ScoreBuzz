@@ -20,6 +20,10 @@ public class LeaderBoard implements Serializable {
 
     private String isActive;
 
+    private Integer totalWins;
+
+    private Integer predictedCount;
+
     public Integer getRank() {
         return rank;
     }
@@ -82,5 +86,21 @@ public class LeaderBoard implements Serializable {
 
     public void setIsActive(String isActive) {
         this.isActive = isActive;
+    }
+
+    public Integer getTotalWins() {
+        return totalWins;
+    }
+
+    public void setTotalWins(Integer totalWins) {
+        this.totalWins = totalWins;
+    }
+
+    public Integer getPredictedCount() {
+        return predictedCount;
+    }
+
+    public void setPredictedCount(Integer predictedCount) {
+        this.predictedCount = predictedCount;
     }
 }

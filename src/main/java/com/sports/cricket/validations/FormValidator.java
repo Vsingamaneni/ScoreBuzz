@@ -115,7 +115,7 @@ public class FormValidator implements Serializable {
                 if(!register.getEmailId().equalsIgnoreCase(register.getConfirmEmailId())){
                     errorDetails = new ErrorDetails();
                     errorDetails.setErrorField("emailId");
-                    errorDetails.setErrorMessage("Both Email and Confirm Email didnt match!!");
+                    errorDetails.setErrorMessage("Both Email and Confirm Email didn't match!!");
                     errorsList.add(errorDetails);
                 }
             }

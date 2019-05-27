@@ -43,7 +43,7 @@
 <!-- Top container -->
 <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
     <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i> &nbsp;Menu</button>
-    <span class="w3-bar-item w3-right">Score Finder</span>
+    <span class="w3-bar-item w3-right">Score Buzz</span>
 </div>
 
 <!-- Sidebar/menu -->
@@ -66,20 +66,18 @@
     <div class="w3-bar-block">
         <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black"
            onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>&nbsp; Close Menu</a>
-        <c:if test="${session.choice.equalsIgnoreCase('Odds Per Game')}">
+        <c:if test="${session.choice.equalsIgnoreCase('1')}">
             <%@include file="navigation/gameodds.jsp" %>
         </c:if>
-        <c:if test="${session.choice.equalsIgnoreCase('Top Ten')}">
+        <c:if test="${session.choice.equalsIgnoreCase('2')}">
             <%@include file="navigation/topten.jsp" %>
         </c:if>
-        <c:if test="${session.choice.equalsIgnoreCase('Both')}">
+        <c:if test="${session.choice.equalsIgnoreCase('3')}">
             <%@include file="navigation/both.jsp" %>
         </c:if>
 
         <c:if test="${role.equalsIgnoreCase('admin')}">
-            <a href="/saveResult" class="w3-bar-item w3-button w3-padding"><i class="fa fa-legal"></i>&nbsp; Update
-                Result</a>
-
+            <%@include file="navigation/admin.jsp" %>
         </c:if>
         <a href="/logout" class="w3-bar-item w3-button w3-padding"><i class="fa fa-power-off"></i>&nbsp; Logout</a>
     </div>

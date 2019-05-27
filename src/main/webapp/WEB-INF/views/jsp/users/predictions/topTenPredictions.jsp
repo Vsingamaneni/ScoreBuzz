@@ -1,8 +1,8 @@
 <%--
   Created by IntelliJ IDEA.
   User: v0s004a
-  Date: 1/11/19
-  Time: 5:41 PM
+  Date: 5/22/19
+  Time: 11:55 PM
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page session="false" %>
@@ -33,7 +33,7 @@
 <!-- Top container -->
 <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
     <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i> &nbsp;Menu</button>
-    <span class="w3-bar-item w3-right">Score Finder</span>
+    <span class="w3-bar-item w3-right">Score Buzz</span>
 </div>
 
 <c:if test="${not empty session}">
@@ -66,20 +66,18 @@
     <div class="w3-bar-block">
         <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black"
            onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>&nbsp; Close Menu</a>
-        <c:if test="${session.choice.equalsIgnoreCase('Odds Per Game')}">
-            <%@include file="navigation/gameodds.jsp" %>
+        <c:if test="${session.choice.equalsIgnoreCase('1')}">
+            <%@include file="../navigation/gameodds.jsp" %>
         </c:if>
-        <c:if test="${session.choice.equalsIgnoreCase('Top Ten')}">
-            <%@include file="navigation/topten.jsp" %>
+        <c:if test="${session.choice.equalsIgnoreCase('2')}">
+            <%@include file="../navigation/topten.jsp" %>
         </c:if>
-        <c:if test="${session.choice.equalsIgnoreCase('Both')}">
-            <%@include file="navigation/both.jsp" %>
+        <c:if test="${session.choice.equalsIgnoreCase('3')}">
+            <%@include file="../navigation/both.jsp" %>
         </c:if>
 
         <c:if test="${role.equalsIgnoreCase('admin')}">
-            <a href="/saveResult" class="w3-bar-item w3-button w3-padding"><i class="fa fa-legal"></i>&nbsp; Update
-                Result</a>
-
+            <%@include file="../navigation/admin.jsp" %>
         </c:if>
         <a href="/logout" class="w3-bar-item w3-button w3-padding"><i class="fa fa-power-off"></i>&nbsp; Logout</a>
     </div>
@@ -89,19 +87,6 @@
 
 <!-- !PAGE CONTENT! -->
 <div class="w3-main" style="margin-left:300px;margin-top:43px;">
-
-    <c:if test="${isActivated.equalsIgnoreCase('N')}">
-        <div class="w3-row-padding w3-margin-bottom">
-            <div class="w3-container w3-red w3-padding-16">
-                <div class="w3-left"><i class="fa fa-comment w3-xxxlarge"></i></div>
-                <div class="w3-right">
-                </div>
-                <div class="w3-clear"></div>
-                <h4>Hello ${user_name}, You need to be active in order to predict for matches. !! Please contact the admin !</h4>
-            </div>
-        </div>
-        <br><br>
-    </c:if>
 
     <br />
     <c:if test="${not empty msg}">
@@ -114,61 +99,19 @@
     <div class="w3-panel">
         <div class="w3-row-padding" style="margin:0 auto">
             <div style="width:100%">
-                <c:if test="${not role.equalsIgnoreCase('admin')}">
-                    <c:if test="${not empty adminPredictions}">
-                        <h1 style="text-align:center;">Admin Predictions</h1>
-                        <br />
-                        <table class="w3-table w3-striped w3-white"
-                               style="text-align: center; align:center; align-content: center">
-                            <tr align="center">
-                                <thead>
-                                <th>#Game</th>
-                                <th>Name</th>
-                                <th>Fixture</th>
-                                <th>Choice</th>
-                                <th>Predicted Time</th>
-                                </thead>
-                            </tr>
-                            <c:forEach var="predictions" items="${adminPredictions}">
-                                <tr style="color:black;font-size:20px;text-decoration:none;">
-                                    <td style="text-align:left;"><b>${predictions.matchNumber}</b></td>
-                                    <td style="text-align:left;"><b>${predictions.firstName} </b></td>
-                                    <td style="text-align:left;"><b>${predictions.homeTeam}
-                                        vs ${predictions.awayTeam} </b></td>
-                                    <td style="text-align:left;"><b>${predictions.selected} </b></td>
-                                    <td style="text-align:left;"><b>${predictions.predictedTime} </b></td>
-                                </tr>
-                            </c:forEach>
-                        </table>
-                    </c:if>
-                    <br /><br />
-                </c:if>
                 <h1 style="text-align:center;">Match Day Predictions</h1>
                 <br />
-                <c:if test="${not empty deadLineSchedule}">
-                    <c:forEach var="schedule" items="${deadLineSchedule}">
-                        <div style="width:50%; text-align:center;color:darkred; background-color: #d5e693; margin:0 auto; padding: 25px;border-radius: 15px 50px 30px">
-                            <table>
-                                <div class="alert alert-${css} alert-dismissible" role="alert">
-                                    <h4>Deadline : ${schedule.deadline}</h4>
-                                    <h4>Predictions will be available after deadline..!</h4>
-                                </div>
-                            </table>
-                        </div>
-                        <br/><br/>
-                    </c:forEach>
-                </c:if>
                 <c:forEach var="schedulePrediction" items="${schedulePredictions}">
-                <c:if test="${not empty schedulePrediction.schedule}">
-                    <h1 style="text-align:center;">Deadline : ${schedulePrediction.schedule.deadline}</h1>
-                    <hr>
+                    <c:if test="${not empty schedulePrediction.schedule}">
+                        <h1 style="text-align:center;">Deadline : ${schedulePrediction.schedule.deadline}</h1>
+                        <hr>
                         <span style="display:flex;">
                         <input type="button" value="${fn:toUpperCase(schedulePrediction.schedule.homeTeam)} : ${schedulePrediction.homeTeamCount}" style=" margin: 0 auto;" class="btn btn-info">
                         <input type="button" value="${fn:toUpperCase(schedulePrediction.schedule.awayTeam)} : ${schedulePrediction.awayTeamCount}" style=" margin: 0 auto;" class="btn btn-primary">
                         <input type="button" value="DEFAULT : ${schedulePrediction.notPredicted}" style=" margin: 0 auto;" class="btn btn-danger">
                         </span>
-                    <br />
-                </c:if>
+                        <br />
+                    </c:if>
                     <c:if test="${schedulePrediction.deadlinReached}">
                         <span style="display:flex;">
                         <input type="button"  value="${fn:toUpperCase(schedulePrediction.schedule.homeTeam)} : ${schedulePrediction.homeWinAmount}" style=" margin: 0 auto;" class="btn btn-info">
@@ -176,28 +119,28 @@
                         </span>
                     </c:if>
                     <br /><br />
-                <table class="w3-table w3-striped w3-white" style="text-align: center; align:center; align-content: center">
-                    <tr align="center">
-                        <thead>
-                        <th>#Game</th>
-                        <th>Name</th>
-                        <th>Fixture</th>
-                        <th>Choice</th>
-                        <th>Predicted Time</th>
-                        </thead>
-                    </tr>
-                    <c:if test="${not empty schedulePrediction}">
-                        <c:forEach var="predictions" items="${schedulePrediction.prediction}">
-                            <tr style="color:black;font-size:20px;text-decoration:none;">
-                                <td style="text-align:left;"> <b>${predictions.matchNumber}</b></td>
-                                <td style="text-align:left;"> <b>${fn:toUpperCase(predictions.firstName)} </b></td>
-                                <td style="text-align:left;"><b>${predictions.homeTeam} vs ${predictions.awayTeam} </b> </td>
-                                <td style="text-align:left;"><b>${predictions.selected} </b> </td>
-                                <td style="text-align:left;"><b>${predictions.predictedTime} </b></td>
-                            </tr>
-                        </c:forEach>
-                    </c:if>
-                </table>
+                    <table class="w3-table w3-striped w3-white" style="text-align: center; align:center; align-content: center">
+                        <tr align="center">
+                            <thead>
+                            <th>#Game</th>
+                            <th>Name</th>
+                            <th>Fixture</th>
+                            <th>Choice</th>
+                            <th>Predicted Time</th>
+                            </thead>
+                        </tr>
+                        <c:if test="${not empty schedulePrediction}">
+                            <c:forEach var="predictions" items="${schedulePrediction.prediction}">
+                                <tr style="color:black;font-size:20px;text-decoration:none;">
+                                    <td style="text-align:left;"> <b>${predictions.matchNumber}</b></td>
+                                    <td style="text-align:left;"> <b>${fn:toUpperCase(predictions.firstName)} </b></td>
+                                    <td style="text-align:left;"><b>${predictions.homeTeam} vs ${predictions.awayTeam} </b> </td>
+                                    <td style="text-align:left;"><b>${predictions.selected} </b> </td>
+                                    <td style="text-align:left;"><b>${predictions.predictedTime} </b></td>
+                                </tr>
+                            </c:forEach>
+                        </c:if>
+                    </table>
                     <br /><br /><br />
                 </c:forEach>
                 <hr>

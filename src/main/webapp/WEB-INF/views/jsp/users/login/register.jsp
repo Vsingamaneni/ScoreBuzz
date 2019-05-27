@@ -34,9 +34,8 @@
 <div class="limiter">
     <div class="container-login100" style="background-image: url('/resources/login/images/eden.jpg');">
         <div class="wrap-login100 p-t-30 p-b-50">
-				<span class="login100-form-title p-b-41">
-					Get In
-				</span>
+				<span class="login100-form-title p-b-41">Let me get you in</span>
+
             <form class="login100-form validate-form p-b-33 p-t-5" action="/registerUser" modelAttribute="registerForm" method="POST">
 
                 <c:if test="${fn:length(registerErrorDetails) > 0}">
@@ -70,18 +69,18 @@
 
                 <div class="wrap-input100 validate-input" data-validate="First Name">
                     <input class="input100" type="text" placeholder="First Name" name="fName">
-                    <span class="focus-input100" data-placeholder="&#xe80f;"></span>
+                    <span class="focus-input100" data-placeholder="&#xe82a;"></span>
                 </div>
 
                 <div class="wrap-input100 validate-input" data-validate="Last Name">
                     <input class="input100" type="text" placeholder="Last Name" name="lName">
-                    <span class="focus-input100" data-placeholder="&#xe80f;"></span>
+                    <span class="focus-input100" data-placeholder="&#xe82a;"></span>
                 </div>
 
                 <div class="wrap-input100 validate-input" data-validate="Country">
                     <div align="center">
                         <select style="text-align: center; text-align-last: center;" class='input50' name="country">
-                            <option>Select Country</option>
+                            <option><b>Select Country</b></option>
                             <option>India</option>
                             <option>United States</option>
                             <option>England</option>
@@ -91,10 +90,15 @@
                     </div>
                 </div>
 
+                <div class="wrap-input100 validate-input" data-validate="Secret Key">
+                    <input class="input100" type="password" placeholder="Secret Key" name="security">
+                    <span class="focus-input100" data-placeholder="&#xe80f;"></span>
+                </div>
+
                 <div class="wrap-input100 validate-input" data-validate="choice">
                     <div align="center">
                         <select style="text-align: center; text-align-last: center;" class='input50' name="choice">
-                            <option>Game Option</option>
+                            <option><b>Game Option</b></option>
                             <option>Odds Per Game</option>
                             <option>Top Ten</option>
                             <option>Both</option>
@@ -105,7 +109,7 @@
                 <div class="wrap-input100 validate-input" data-validate="Security Question">
                     <div align="center">
                         <select style="text-align: center; text-align-last: center;" class='input50' name="securityQuestion">
-                            <option> Security Question </option>
+                            <option><b>Security Question</b></option>
                             <option>What is your best friend name?</option>
                             <option>Who is your favourite Cricketer</option>
                             <option>What is the name of your first pet?</option>
@@ -115,11 +119,6 @@
 
                 <div class="wrap-input100 validate-input" data-validate="Security Answer">
                     <input class="input100" type="password" placeholder="Security Answer" name="securityAnswer">
-                    <span class="focus-input100" data-placeholder="&#xe80f;"></span>
-                </div>
-
-                <div class="wrap-input100 validate-input" data-validate="Secret Key">
-                    <input class="input100" type="password" placeholder="Secret Key" name="security">
                     <span class="focus-input100" data-placeholder="&#xe80f;"></span>
                 </div>
 

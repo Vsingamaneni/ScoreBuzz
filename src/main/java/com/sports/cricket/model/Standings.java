@@ -30,6 +30,10 @@ public class Standings implements Serializable {
 
     private String result;
 
+    private Integer predictedCount;
+
+    private Integer winCount;
+
     public Integer getId() {
         return id;
     }
@@ -132,5 +136,21 @@ public class Standings implements Serializable {
 
     public void setResult(String result) {
         this.result = result;
+    }
+
+    public Integer getPredictedCount() {
+        return predictedCount;
+    }
+
+    public void setPredictedCount(Integer predictedCount) {
+        this.predictedCount = predictedCount;
+    }
+
+    public Integer getWinCount() {
+        return winCount;
+    }
+
+    public void setWinCount(Integer winCount) {
+        this.winCount = winCount;
     }
 }

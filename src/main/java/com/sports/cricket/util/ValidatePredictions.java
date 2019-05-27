@@ -37,12 +37,12 @@ public class ValidatePredictions implements Serializable {
 
         List<Schedule> validSchedule = new ArrayList<>();
 
-        if(!CollectionUtils.isEmpty(scheduleList)){
-            for(Schedule schedule : scheduleList){
-                if(null != schedule.getStartDate()){
-                    if(null == schedule.getWinner() && ValidateDeadline.isPredictionValid(schedule.getStartDate())){
+        if (!CollectionUtils.isEmpty(scheduleList)) {
+            for (Schedule schedule : scheduleList) {
+                if (null != schedule.getStartDate()) {
+                    if (null == schedule.getWinner() && ValidateDeadline.isPredictionValid(schedule.getStartDate())) {
                         schedule.setCanPredict(true);
-                    } else{
+                    } else {
                         schedule.setCanPredict(false);
                     }
                     validSchedule.add(schedule);

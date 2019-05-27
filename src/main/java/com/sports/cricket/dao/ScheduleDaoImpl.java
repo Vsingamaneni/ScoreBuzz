@@ -36,8 +36,8 @@ public class ScheduleDaoImpl implements ScheduleDao, Serializable {
     }
 
     @Override
-    public List<Schedule> findAll() {
-        String sql = "SELECT * FROM SCHEDULE where isActive = TRUE";
+    public List<Schedule> findAll(String name) {
+        String sql = "SELECT * FROM "+name+" where isActive = TRUE";
 
         List<Schedule> result = jdbcTemplate.query(sql, new BeanPropertyRowMapper(Schedule.class));
 
@@ -54,12 +54,21 @@ public class ScheduleDaoImpl implements ScheduleDao, Serializable {
     }
 
     @Override
-    public Schedule findById(Integer matchNumber) {
+    public List<Schedule> topTenScheduleList() {
+        String sql = "SELECT * FROM TOP_SCHEDULE";
+
+        List<Schedule> result = jdbcTemplate.query(sql, new BeanPropertyRowMapper(Schedule.class));
+
+        return result;
+    }
+
+    @Override
+    public Schedule findById(Integer matchNumber,  String name) {
 
         Map<String, Object> params = new HashMap<>();
         params.put("matchNumber", matchNumber);
 
-        String sql = "SELECT * FROM SCHEDULE where matchNumber = ?";
+        String sql = "SELECT * FROM " +name + " where matchNumber = ?";
 
         Schedule result = null;
         try {
@@ -80,11 +89,20 @@ public class ScheduleDaoImpl implements ScheduleDao, Serializable {
     }
 
     @Override
-    public boolean savePrediction(Prediction prediction) {
+    public List<Prediction> findTopTenPredictions(Integer memberId) {
+        String sql = "SELECT * FROM TOP_PREDICTIONS where memberId = " + memberId;
+
+        List<Prediction> result = jdbcTemplate.query(sql, new BeanPropertyRowMapper(Prediction.class));
+
+        return result;
+    }
+
+    @Override
+    public boolean savePrediction(Prediction prediction, String name) {
 
         boolean isSuccess = false;
 
-        String sql = "INSERT INTO PREDICTIONS(memberId, matchNumber, homeTeam, awayTeam, firstName, selected, predictedTime, matchday)" +
+        String sql = "INSERT INTO "+ name +"(memberId, matchNumber, homeTeam, awayTeam, firstName, selected, predictedTime, matchday)" +
                     "VALUES (?,?,?,?,?,?,?,?)";
 
 
@@ -120,10 +138,10 @@ public class ScheduleDaoImpl implements ScheduleDao, Serializable {
     }
 
     @Override
-    public boolean updatePrediction(Prediction prediction) {
+    public boolean updatePrediction(Prediction prediction, String name) {
         boolean isSuccess = false;
 
-        String sql = "UPDATE PREDICTIONS SET selected = ? , predictedTime = ? where predictionId = ?";
+        String sql = "UPDATE "+name+" SET selected = ? , predictedTime = ? where predictionId = ?";
 
 
         Connection conn = null;
@@ -154,12 +172,12 @@ public class ScheduleDaoImpl implements ScheduleDao, Serializable {
     }
 
     @Override
-    public Prediction getPrediction(Integer predictionId, Integer matchId) {
+    public Prediction getPrediction(Integer predictionId, Integer matchId, String name) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("predictionId", predictionId);
         params.put("matchId", matchId);
 
-        String sql = "SELECT * FROM PREDICTIONS where predictionId = ? and matchNumber =?";
+        String sql = "SELECT * FROM " +name+ " where predictionId = ? and matchNumber =?";
 
         Prediction prediction = null;
         try {
@@ -171,11 +189,11 @@ public class ScheduleDaoImpl implements ScheduleDao, Serializable {
     }
 
     @Override
-    public Prediction getPrediction(Integer predictionId) {
+    public Prediction getPrediction(Integer predictionId, String name) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("predictionId", predictionId);
 
-        String sql = "SELECT * FROM PREDICTIONS where predictionId = ?";
+        String sql = "SELECT * FROM "+name+" where predictionId = ?";
 
         Prediction prediction = null;
         try {
@@ -199,10 +217,10 @@ public class ScheduleDaoImpl implements ScheduleDao, Serializable {
     }
 
     @Override
-    public boolean deletePrediction(Integer predictionId) {
+    public boolean deletePrediction(Integer predictionId, String name) {
         boolean isSuccess = false;
 
-        String sql = "DELETE FROM PREDICTIONS where predictionId = ?";
+        String sql = "DELETE FROM "+name+" where predictionId = ?";
 
 
         Connection conn = null;
@@ -244,19 +262,19 @@ public class ScheduleDaoImpl implements ScheduleDao, Serializable {
     }
 
     @Override
-    public List<Prediction> getPredictionsByMatch(Integer matchId) {
+    public List<Prediction> getPredictionsByMatch(Integer matchId, String name) {
         Map<String, Object> params = new HashMap<>();
         params.put("matchId", matchId);
 
-        String sql = "SELECT * FROM PREDICTIONS where matchNumber =?";
+        String sql = "SELECT * FROM "+name+ " where matchNumber =?";
 
         List<Prediction> predictionList = PredictionListMapper.predictionList(jdbcTemplate, sql, matchId);
         return predictionList;
     }
 
     @Override
-    public boolean updateMatchResult(Schedule schedule) {
-        String sql = "UPDATE SCHEDULE SET winner = ?, isActive = ? where matchNumber = ?";
+    public boolean updateMatchResult(Schedule schedule, String name) {
+        String sql = "UPDATE "+name+" SET winner = ?, isActive = ? where matchNumber = ?";
 
 
         Connection conn = null;
@@ -286,11 +304,11 @@ public class ScheduleDaoImpl implements ScheduleDao, Serializable {
     }
 
     @Override
-    public Integer totalMatches(Integer matchDay) {
+    public Integer totalMatches(Integer matchDay, String name) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("matchDay", matchDay);
 
-        String sql = "SELECT count(*) as matchTotal FROM SCHEDULE where matchDay = ?  and isActive = true";
+        String sql = "SELECT count(*) as matchTotal FROM "+name+" where matchDay = ?  and isActive = true";
 
         Integer matchDays = jdbcTemplate.query(sql, new Object[]{matchDay}, rs -> {
 
@@ -305,8 +323,8 @@ public class ScheduleDaoImpl implements ScheduleDao, Serializable {
     }
 
     @Override
-    public boolean updateMatchDay(Integer matchDay) {
-        String sql = "UPDATE SCHEDULE SET  isActive = true where matchDay = " + matchDay;
+    public boolean updateMatchDay(Integer matchDay, String name) {
+        String sql = "UPDATE "+name+" SET  isActive = true where matchDay = " + matchDay;
 
         Connection conn = null;
         int rows;
@@ -331,12 +349,12 @@ public class ScheduleDaoImpl implements ScheduleDao, Serializable {
     }
 
     @Override
-    public boolean addResult(Result result) {
+    public boolean addResult(Result result, String name) {
 
         boolean isSuccess = false;
 
-        String sql = "INSERT INTO RESULTS(matchNumber, homeTeam, awayTeam, startDate, winner, winningAmount, homeTeamCount, awayTeamCount, notPredictedCount, matchDay, drawTeamCount)" +
-                "VALUES (?,?,?,?,?,?,?,?,?,?," +result.getDrawTeamCount()+")";
+        String sql = "INSERT INTO "+name+"(matchNumber, homeTeam, awayTeam, startDate, winner, winningAmount, homeTeamCount, awayTeamCount, notPredictedCount, matchDay, drawTeamCount)" +
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
 
         Connection conn = null;
@@ -354,6 +372,7 @@ public class ScheduleDaoImpl implements ScheduleDao, Serializable {
             ps.setInt(8, (int)result.getAwayTeamCount());
             ps.setInt(9, (int)result.getNotPredictedCount());
             ps.setInt(10, result.getMatchDay());
+            ps.setFloat(11, result.getDrawTeamCount());
 
             ps.executeUpdate();
             ps.close();
@@ -373,10 +392,10 @@ public class ScheduleDaoImpl implements ScheduleDao, Serializable {
     }
 
     @Override
-    public boolean insertPredictions(List<Standings> standingsList) {
+    public boolean insertPredictions(List<Standings> standingsList, String name) {
 
-        String sql = "INSERT INTO STANDINGS (memberId, matchNumber, homeTeam, awayTeam, matchDate, predictedDate, selected, winner, wonAmount, lostAmount) " +
-                "           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO "+name+" (memberId, matchNumber, homeTeam, awayTeam, matchDate, predictedDate, selected, winner, wonAmount, lostAmount, predictedCount) " +
+                "           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
 
@@ -393,6 +412,7 @@ public class ScheduleDaoImpl implements ScheduleDao, Serializable {
                 ps.setString(8, standings.getWinner());
                 ps.setDouble(9, standings.getWonAmount());
                 ps.setDouble(10, standings.getLostAmount());
+                ps.setInt(11, standings.getPredictedCount());
             }
 
             @Override
@@ -405,8 +425,8 @@ public class ScheduleDaoImpl implements ScheduleDao, Serializable {
     }
 
     @Override
-    public List<Standings> getLeaderBoard() {
-        String sql = "SELECT * FROM STANDINGS";
+    public List<Standings> getLeaderBoard(String name) {
+        String sql = "SELECT * FROM "+name;
 
         List<Standings> result = jdbcTemplate.query(sql, new BeanPropertyRowMapper(Standings.class));
 

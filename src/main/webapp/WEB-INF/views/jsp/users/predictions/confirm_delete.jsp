@@ -1,8 +1,8 @@
 <%--
   Created by IntelliJ IDEA.
   User: v0s004a
-  Date: 1/3/19
-  Time: 12:51 AM
+  Date: 1/1/19
+  Time: 10:34 AM
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page session="false" %>
@@ -14,10 +14,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Prediction</title>
+    <title>Confirm Update</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <link rel="icon" type="image/x-icon" href="/resources/login/images/icons/cricket.ico"/>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
@@ -27,7 +26,6 @@
     <link rel="stylesheet" href="/resources/core/css/bootstrap.min.css"/>
     <style>
         html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
-        a href{text-decoration: none;}
     </style>
 </head>
 
@@ -36,20 +34,19 @@
 <!-- Top container -->
 <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
     <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i> &nbsp;Menu</button>
-    <span class="w3-bar-item w3-right">Score Finder</span>
+    <span class="w3-bar-item w3-right">Score Buzz</span>
 </div>
 
 <c:if test="${not empty session}">
-    <c:set var="user_name" value="${session.firstName} ${session.lastName}"/>
+    <c:set var="user_name" value="${session.firstName}"/>
     <c:set var="role" value="${session.role}"/>
-    <c:set var="isActivated" value="${}"/>
 </c:if>
 
 <c:if test="${empty session}">
     <c:set var="user_name" value="User"/>
 </c:if>
 
-<spring:url value="/match/${session.memberId}/save" var="predictionUrl" />
+<spring:url value="/prediction/${predictionForm.predictionId}/delete" var="updateUrl" />
 <spring:url value="/predictions" var="cancelUrl" />
 
 <!-- Sidebar/menu -->
@@ -72,22 +69,20 @@
     <div class="w3-bar-block">
         <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black"
            onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>&nbsp; Close Menu</a>
-        <c:if test="${session.choice.equalsIgnoreCase('Odds Per Game')}">
-            <%@include file="navigation/gameodds.jsp" %>
+        <c:if test="${session.choice.equalsIgnoreCase('1')}">
+            <%@include file="../navigation/gameodds.jsp" %>
         </c:if>
-        <c:if test="${session.choice.equalsIgnoreCase('Top Ten')}">
-            <%@include file="navigation/topten.jsp" %>
+        <c:if test="${session.choice.equalsIgnoreCase('2')}">
+            <%@include file="../navigation/topten.jsp" %>
         </c:if>
-        <c:if test="${session.choice.equalsIgnoreCase('Both')}">
-            <%@include file="navigation/both.jsp" %>
+        <c:if test="${session.choice.equalsIgnoreCase('3')}">
+            <%@include file="../navigation/both.jsp" %>
         </c:if>
 
         <c:if test="${role.equalsIgnoreCase('admin')}">
-            <a href="/saveResult" class="w3-bar-item w3-button w3-padding"><i class="fa fa-legal"></i>&nbsp; Update
-                Result</a>
-
+            <%@include file="../navigation/admin.jsp" %>
         </c:if>
-        <a href="/logout" class="w3-bar-item w3-button w3-padding"><i class="fa fa-power-off"></i>&nbsp; Logout</a>
+        <a href="/logout" style="text-decoration: none" class="w3-bar-item w3-button w3-padding"><i class="fa fa-power-off"></i>&nbsp; Logout</a>
     </div>
 </nav>
 <!-- Overlay effect when opening sidebar on small screens -->
@@ -96,85 +91,58 @@
 <!-- !PAGE CONTENT! -->
 <div class="w3-main" style="margin-left:300px;margin-top:43px;">
 
-
-    <c:if test="${isActivated.equalsIgnoreCase('N')}">
-        <div class="w3-row-padding w3-margin-bottom">
-            <div class="w3-container w3-red w3-padding-16">
-                <div class="w3-left"><i class="fa fa-comment w3-xxxlarge"></i></div>
-                <div class="w3-right">
-                </div>
-                <div class="w3-clear"></div>
-                <h4>Hello ${user_name}, You need to be active in order to update for matches. !! Please contact the admin !</h4>
-                <br><br><br><br><br><br><br><br>
-            </div>
-        </div>
-
-    </c:if>
-    <c:if test="${isActivated.equalsIgnoreCase('Y')}">
-
-        <h2 style="text-align: center;"> &nbsp;&nbsp; Hey ${fn:toUpperCase(user_name)}, Select your team. </h2>
+        <h2 style="text-align: center;"> Hey ${fn:toUpperCase(user_name)}, You are about to delete your prediction. </h2>
         <br /><br /><br />
 
-        <c:if test="${not empty errorDetailsList}">
-            <h2 style="color:red;font-size:15px;text-decoration:none;font-family:Comic Sans MS; text-align:center;"> Dude, fix the below error(s)</h2>
-        </c:if>
-        <c:forEach var="errorDetails" items="${errorDetailsList}">
-            <c:if test="${not empty errorDetails.errorMessage}" >
-                <h2 style="color:red;font-size:15px;text-decoration:none;font-family:Comic Sans MS; text-align:center;"> *** ${errorDetails.errorMessage} </h2>
-            </c:if>
-        </c:forEach>
-        <br />
-
-        <div class='container' style="width:50%; margin: 0 auto;">
+            <div class='container' style="width: 80%; margin: 0 auto;">
                 <div class='panel panel-primary dialog-panel'>
                     <div class='panel-heading' style="background-color: #082a3e;">
-                        <br />
-                        <h3 style="text-align: center;">Good Luck Dude</h3>
+                        <h3 style="text-align: center;">Make sure you don't miss the deadline !!</h3>
                     </div>
                     <div class='panel-body' >
-                        <form action="${predictionUrl}" modelAttribute="predictionForm" method="POST" class='form-horizontal' role='form'>
+                        <form modelAttribute="predictionForm" method="POST" class='form-horizontal' role='form'>
                             <div class='form-group'>
                                 <label class='control-label col-md-2 col-md-offset-2' for='id_event'>Match</label>
                                 <div class='col-md-2'>
                                     <select class='form-control' id='id_event' name="event" style="min-width:150px;">
-                                        <option style="text-align: center">${fn:toUpperCase(scheduleForm.homeTeam)} vs ${fn:toUpperCase(scheduleForm.awayTeam)}</option>
+                                        <option style="text-align: center">${fn:toUpperCase(predictionForm.homeTeam)}
+                                            vs ${fn:toUpperCase(predictionForm.awayTeam)}</option>
                                     </select>
                                 </div>
                             </div>
+                            <input type=hidden id="predictionId" name="predictionId" value="${predictionForm.predictionId}">
                             <input type=hidden id="memberId" name="memberId" value="${session.memberId}">
-                            <input type=hidden id="matchNumber" name="matchNumber" value="${scheduleForm.matchNumber}">
-                            <input type=hidden id="homeTeam" name="homeTeam" value="${scheduleForm.homeTeam}">
-                            <input type=hidden id="awayTeam" name="awayTeam" value="${scheduleForm.awayTeam}">
-                            <input type=hidden id="matchDay" name="matchDay" value="${scheduleForm.matchDay}">
+                            <input type=hidden id="matchNumber" name="matchNumber" value="${predictionForm.matchNumber}">
+                            <input type=hidden id="homeTeam" name="homeTeam" value="${predictionForm.homeTeam}">
+                            <input type=hidden id="awayTeam" name="awayTeam" value="${predictionForm.awayTeam}">
                             <div class='form-group'>
                                 <label class='control-label col-md-2 col-md-offset-2' for='id_name'>Name</label>
                                 <div class='col-md-2'>
-                                    <select class='form-control' id='id_name' name="firstName" style="min-width:150px; ">
-                                        <%--<option>   --- SELECT ---    </option>--%>
-                                        <option style="text-align: center">${user_name}</option>
+                                    <select class='form-control' id='id_name' name="abc"
+                                            style="min-width:150px; ">
+                                        <option style="text-align: center">${predictionForm.firstName}</option>
                                     </select>
                                 </div>
                             </div>
                             <div class='form-group'>
-                                <label class='control-label col-md-2 col-md-offset-2' for='id_selected'>Your Choice</label>
+                                <label class='control-label col-md-2 col-md-offset-2' for='id_selected'>Selected</label>
                                 <div class='col-md-2'>
-                                    <select class='form-control' id='id_selected' name="selected" style="min-width:150px; ">
-                                        <option>   --- SELECT ---    </option>
-                                        <option style="text-align: center">${fn:toUpperCase(scheduleForm.homeTeam)}</option>
-                                        <option style="text-align: center">${fn:toUpperCase(scheduleForm.awayTeam)}</option>
+                                    <select class='form-control' id='id_selected' name="selected"
+                                            style="min-width:150px; ">
+                                        <option style="text-align: center">${predictionForm.selected}</option>
                                     </select>
                                 </div>
                             </div>
                             <br />
                             <div class='form-group'>
                                 <div class='col-md-offset-4 col-md-3'>
-                                    <button class='btn-lg btn-primary' type='submit' onclick="post('${predictionUrl}')">
-                                        UPDATE
+                                    <button class='btn-lg btn-primary' type='submit' onclick="post('/prediction/${predictionForm.predictionId}/delete/${predictionForm.choice}')">
+                                        Confirm
                                     </button>
                                 </div>
                                 <div class='col-md-3'>
                                     <button class='btn-lg btn-danger' type='submit'>
-                                        <a href="/predictions" style="color:white;text-decoration : none">CANCEL</a>
+                                        <a href="/predictions" style="color:white;text-decoration : none;">Cancel</a>
                                     </button>
                                 </div>
                             </div>
@@ -182,9 +150,7 @@
                     </div>
                 </div>
             </div>
-
-    </c:if>
-    <br /><br /><br /><br />
+    <br>
 
     <!-- Footer -->
     <footer class="w3-container w3-padding-16 w3-light-grey">

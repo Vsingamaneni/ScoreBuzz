@@ -135,11 +135,11 @@ public class PredictionListMapper implements Serializable {
         return matchDetailsList;
     }
 
-    public static List<Prediction> adminPredictions(RegistrationService registrationService, ScheduleService scheduleService){
+    public static List<Prediction> adminPredictions(RegistrationService registrationService, ScheduleService scheduleService, String name){
 
         int memberId = getAdminId(registrationService);
 
-        int matchday = getActiveMatchDay(scheduleService);
+        int matchday = getActiveMatchDay(scheduleService, name);
 
         List<Prediction> adminPredictions = scheduleService.getAdminPrediction(memberId, matchday);
 
@@ -160,10 +160,10 @@ public class PredictionListMapper implements Serializable {
         return adminId;
     }
 
-    public static int getActiveMatchDay(ScheduleService scheduleService){
+    public static int getActiveMatchDay(ScheduleService scheduleService, String name){
         int matchDay = 0;
 
-        List<Schedule> scheduleList = scheduleService.findAll();
+        List<Schedule> scheduleList = scheduleService.findAll(name);
         for (Schedule schedule : scheduleList){
             if (!schedule.isIsactive()){
                 continue;

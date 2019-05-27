@@ -6,43 +6,47 @@ import java.util.List;
 
 public interface ScheduleDao {
 
-    List<Schedule> findAll();
+    List<Schedule> findAll(String name);
 
     List<Schedule> scheduleList();
 
-    Schedule findById(Integer matchNumber);
+    List<Schedule> topTenScheduleList();
+
+    Schedule findById(Integer matchNumber,  String name);
 
     List<Prediction> findPredictions(Integer memberId);
 
-    boolean savePrediction(Prediction prediction);
+    List<Prediction> findTopTenPredictions(Integer memberId);
 
-    boolean updatePrediction(Prediction prediction);
+    boolean savePrediction(Prediction prediction, String name);
 
-    Prediction getPrediction(Integer predictionId, Integer matchId);
+    boolean updatePrediction(Prediction prediction, String name);
 
-    Prediction getPrediction(Integer predictionId);
+    Prediction getPrediction(Integer predictionId, Integer matchId, String name);
+
+    Prediction getPrediction(Integer predictionId, String name);
 
     List<Prediction> getPredictionByMatchDay(Integer matchDay);
 
-    boolean deletePrediction(Integer predictionId);
+    boolean deletePrediction(Integer predictionId, String name);
 
     boolean authorizeMember(Integer memberID);
 
     boolean deactivateMember(Integer memberID);
 
-    List<Prediction> getPredictionsByMatch(Integer matchId);
+    List<Prediction> getPredictionsByMatch(Integer matchId, String name);
 
-    boolean updateMatchResult(Schedule schedule);
+    boolean updateMatchResult(Schedule schedule, String name);
 
-    Integer totalMatches(Integer matchDay);
+    Integer totalMatches(Integer matchDay, String name);
 
-    boolean updateMatchDay(Integer matchDay);
+    boolean updateMatchDay(Integer matchDay, String name);
 
-    boolean addResult(Result result);
+    boolean addResult(Result result, String name);
 
-    boolean insertPredictions(List<Standings> standingsList);
+    boolean insertPredictions(List<Standings> standingsList, String name);
 
-    List<Standings> getLeaderBoard();
+    List<Standings> getLeaderBoard(String name);
 
     List<Settlement> getSettlement();
 

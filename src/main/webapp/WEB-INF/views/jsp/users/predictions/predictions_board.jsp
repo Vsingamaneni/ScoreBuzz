@@ -1,8 +1,8 @@
 <%--
   Created by IntelliJ IDEA.
   User: v0s004a
-  Date: 2/12/19
-  Time: 9:53 PM
+  Date: 5/20/19
+  Time: 8:46 PM
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page session="false" %>
@@ -14,10 +14,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Registered Users</title>
+    <title>Top Ten Predictions</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/png" href="/resources/login/images/icons/cricket.ico"/>
+    <link rel="icon" type="image/x-icon" href="/resources/login/images/icons/cricket.ico"/>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -33,12 +33,13 @@
 <!-- Top container -->
 <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
     <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i> &nbsp;Menu</button>
-    <span class="w3-bar-item w3-right">Members List</span>
+    <span class="w3-bar-item w3-right">Score Buzz</span>
 </div>
 
 <c:if test="${not empty session}">
     <c:set var="user_name" value="${session.firstName}"/>
     <c:set var="role" value="${session.role}"/>
+    <c:set var="choice" value="2"/>
 </c:if>
 
 <c:if test="${empty session}">
@@ -66,17 +67,17 @@
         <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black"
            onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>&nbsp; Close Menu</a>
         <c:if test="${session.choice.equalsIgnoreCase('1')}">
-            <%@include file="navigation/gameodds.jsp" %>
+            <%@include file="../navigation/gameodds.jsp" %>
         </c:if>
         <c:if test="${session.choice.equalsIgnoreCase('2')}">
-            <%@include file="navigation/topten.jsp" %>
+            <%@include file="../navigation/topten.jsp" %>
         </c:if>
         <c:if test="${session.choice.equalsIgnoreCase('3')}">
-            <%@include file="navigation/both.jsp" %>
+            <%@include file="../navigation/both.jsp" %>
         </c:if>
 
         <c:if test="${role.equalsIgnoreCase('admin')}">
-            <%@include file="navigation/admin.jsp" %>
+            <%@include file="../navigation/admin.jsp" %>
         </c:if>
         <a href="/logout" class="w3-bar-item w3-button w3-padding"><i class="fa fa-power-off"></i>&nbsp; Logout</a>
     </div>
@@ -86,66 +87,112 @@
 
 <!-- !PAGE CONTENT! -->
 <div class="w3-main" style="margin-left:300px;margin-top:43px;">
+
+
+
+    <c:if test="${isActivated.equalsIgnoreCase('N')}">
+        <div class="w3-row-padding w3-margin-bottom">
+            <div class="w3-container w3-red w3-padding-16">
+                <div class="w3-left"><i class="fa fa-comment w3-xxxlarge"></i></div>
+                <div class="w3-right">
+                </div>
+                <div class="w3-clear"></div>
+                <h4>Hello ${user_name}, You need to be active in order to predict for matches. !! Please contact the admin !</h4>
+            </div>
+        </div>
+        <br>
+    </c:if>
+
+    <h2 style="text-align: center;"> &nbsp;&nbsp; Hey ${fn:toUpperCase(user_name)}, your match day predictions are below. </h2>
+
     <c:if test="${not empty msg}">
-        <div class="alert alert-${css} alert-dismissible" style="text-align:center;color:#204d74;" role="alert">
+        <div class="alert alert-${css} alert-dismissible" style="text-align:center;color:#4CAF50;" role="alert">
             <h4><strong>${msg}</strong></h4>
         </div>
     </c:if>
 
+    <!-- Predictions -->
+    <header class="w3-container" style="padding-top:22px">
+        <h3><b><i class="fa fa-plus"></i> MatchDay Predictions </b></h3>
+    </header>
+
     <div class="w3-panel">
         <div class="w3-row-padding" style="margin:0 auto">
-            <div style="width:90%">
-                <br /><br />
-                <h1 style="text-align: center;">Registered Members</h1>
-                <br />
+            <div style="width:100%">
                 <table class="w3-table w3-striped w3-white" style="text-align: center; align:center; align-content: center">
-                    <thead>
-                    <tr>
-                        <th>Member #</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Status</th>
+                    <tr align="center">
+                        <th>#Game</th>
+                        <th>Fixture</th>
+                        <th>Choice</th>
+                        <th>Predicted Time</th>
+                        <th>Action</th>
                     </tr>
-                    </thead>
+                    <c:forEach var="prediction" items="${predictions}">
+                        <c:if test="${not empty prediction}">
+                            <tr style="color:black;font-size:20px;text-decoration:none;font-family:Comic Sans MS;align:center;">
+                                <td>${fn:toUpperCase(prediction.matchNumber)}</td>
+                                <td>${fn:toUpperCase(prediction.homeTeam)} vs ${fn:toUpperCase(prediction.awayTeam)}</td>
+                                <td>${fn:toUpperCase(prediction.selected)}</td>
+                                <td>${fn:toUpperCase(prediction.predictedTime)}</td>
+                                <td>
+                                    <spring:url value="/prediction/${prediction.predictionId}/${prediction.matchNumber}/update" var="updateUrl" />
+                                    <spring:url value="/prediction/${prediction.predictionId}/delete" var="deleteUrl" />
 
-                    <c:forEach var="register" items="${registerList}">
+                                    <c:if test="${prediction.canPredict}">
+                                        <button class="btn btn-primary" onclick="location.href='${updateUrl}'">Update</button>
+                                        <button class="btn btn-danger" onclick="location.href=('${deleteUrl}')">Delete</button>
+                                    </c:if>
+                                </td>
+                            </tr>
+                        </c:if>
+                    </c:forEach>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Up Coming Schedule -->
+    <header class="w3-container" style="padding-top:22px">
+        <h3><b><i class="fa fa-bell"></i> Up Coming  </b></h3>
+    </header>
+
+    <div class="w3-panel">
+        <div class="w3-row-padding" style="margin:0 auto">
+            <div style="width:100%">
+                <table class="w3-table w3-striped w3-white" style="text-align: center; align:center; align-content: center">
+                    <tr align="center">
+                        <th>#Game</th>
+                        <th>Fixture</th>
+                        <th>Deadline</th>
+                        <th>Action</th>
+                    </tr>
+                    <c:forEach var="schedule" items="${schedules}">
                         <tr style="color:black;font-size:20px;text-decoration:none;font-family:Comic Sans MS">
-                            <td style="text-align:left;"> ${register.memberId}</td>
-                            <td style="text-align:left;">${fn:toUpperCase(register.fName)}</td>
-                            <td style="text-align:left;">${fn:toUpperCase(register.lName)}</td>
+                            <td style="text-align:left;">${schedule.matchNumber}</td>
+                            <td style="text-align:left;">${schedule.homeTeam} vs ${schedule.awayTeam}</td>
+                            <td style="text-align:left;">${schedule.deadline}</td>
                             <td style="text-align:left;">
-                                <spring:url value="/member/${register.memberId}/authorize" var="activateUrl"/>
-                                <spring:url value="/member/${register.memberId}/deactivate" var="deactivateUrl"/>
-                                <c:if test="${role.equalsIgnoreCase('admin')}">
-                                    <c:if test="${!register.isActive.equalsIgnoreCase('Y')}">
-                                        <button class="btn btn-info" onclick="location.href='${activateUrl}'">Authorize
-                                        </button>
+                                <spring:url value="/match/${session.memberId}/${schedule.matchNumber}/predict/${choice}" var="predictUrl" />
+                                <c:if test="${session.isActive.equalsIgnoreCase('Y')}">
+                                    <c:if test="${schedule.canPredict}">
+                                        <button class="btn btn-primary" onclick="location.href='${predictUrl}'">Predict</button>
                                     </c:if>
-                                    <c:if test="${register.isActive.equalsIgnoreCase('Y')}">
-                                        <button class="btn btn-info" onclick="">Active</button> &nbsp;&nbsp;
-                                        <button class="btn btn-danger" onclick="location.href='${deactivateUrl}'">Opt Out</button>
-                                    </c:if>
-                                    <c:if test="${!register.isActive.equalsIgnoreCase('Y')}">
-                                        <button class="btn btn-danger" onclick="">In Active</button>
+                                    <c:if test="${!schedule.canPredict}">
+                                        <button class="btn btn-danger" onclick="location.href='#'">You Missed it</button>
                                     </c:if>
                                 </c:if>
-                                <c:if test="${!role.equalsIgnoreCase('admin')}">
-                                    <c:if test="${register.isActive.equalsIgnoreCase('Y')}">
-                                        <button class="btn btn-info" onclick="">Active</button>
-                                    </c:if>
-                                    <c:if test="${!register.isActive.equalsIgnoreCase('Y')}">
-                                        <button class="btn btn-danger" onclick="">In Active</button>
-                                    </c:if>
+                                <c:if test="${session.isActive.equalsIgnoreCase('N')}">
+                                    <button class="btn btn-danger" onclick="location.href='#'">Not Active</button>
                                 </c:if>
                             </td>
                         </tr>
                     </c:forEach>
                 </table>
-                <br /><br /><br />
-                <hr>
             </div>
         </div>
     </div>
+
+    <hr>
 
     <hr>
 
