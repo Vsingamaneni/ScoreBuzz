@@ -8,11 +8,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Properties;
 
 @Configuration
 public class SpringJDBCConfiguration implements Serializable {
-    @Bean
+    /*@Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         //MySQL database we are using
@@ -26,14 +29,30 @@ public class SpringJDBCConfiguration implements Serializable {
         dataSource.setPassword("");
 
         return dataSource;
-    }
+    }*/
     // Google Cloud connection
-   /* @Bean
+    @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setUrl(System.getProperty("ipl"));
+        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+        String url = null;
+
+        Properties properties = new Properties();
+
+        try {
+            String propFileName = "config.properties";
+            InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
+            properties.load(inputStream);
+            url = properties.getProperty("sqlUrl");
+        } catch (IOException e) {
+            System.out.println("Failed to read properties");
+        }
+
+        dataSource.setUrl(url);
+
+        //dataSource.setUrl(System.getProperty("auto"));
         return dataSource;
-    }*/
+    }
 
     @Bean
     public JdbcTemplate jdbcTemplate() {

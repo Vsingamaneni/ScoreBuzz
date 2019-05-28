@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-<runtime>java8</runtime>
-<threadsafe>true</threadsafe>
-<application>ipl-scoreboard-234500</application>
-<version>cricket</version>
-<sessions-enabled>true</sessions-enabled>
+    <runtime>java8</runtime>
+    <threadsafe>true</threadsafe>
+    <application>scorebuzz-worldcup</application>
+    <!--<application>scorebuzz-2019</application>-->
+    <version>sports</version>
+    <sessions-enabled>true</sessions-enabled>
+    <async-session-persistence enabled="true" />
+    <use-google-connector-j>true</use-google-connector-j>
 
-<service>worldcup</service>
+    <service>sports</service>
 
-<system-properties>
-    <property name="worldcup" value="jdbc:mysql://google/${database}?useSSL=false&amp;cloudSqlInstance=${INSTANCE_CONNECTION_NAME}&amp;socketFactory=com.google.cloud.sql.mysql.SocketFactory&amp;user=${user}&amp;password=${password}" />
-</system-properties>
+    <!--<system-properties>
+        <property name="auto" value="jdbc:mysql://google/${database}?useSSL=false&amp;cloudSqlInstance=${INSTANCE_CONNECTION_NAME}&amp;socketFactory=com.google.cloud.sql.mysql.SocketFactory&amp;user=${user}&amp;password=${password}"/>
+    </system-properties>-->
 </appengine-web-app>

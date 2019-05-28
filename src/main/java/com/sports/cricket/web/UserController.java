@@ -142,7 +142,7 @@ public class UserController implements Serializable {
         if (null == userLogin){
             return "redirect:/";
         } else {
-            httpSession.setMaxInactiveInterval(10 * 60);
+            
             List<Standings> standingsList = scheduleService.getLeaderBoard("STANDINGS");
             Restrictions restrictions = registrationService.getRestrictions();
 
@@ -193,7 +193,6 @@ public class UserController implements Serializable {
             model.addAttribute("session", userLogin);
             model.addAttribute("userLogin", userLogin);
 
-            httpSession.setMaxInactiveInterval(10 * 60);
             return "users/welcome";
         }
     }
