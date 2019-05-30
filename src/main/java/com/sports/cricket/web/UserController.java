@@ -831,7 +831,11 @@ public class UserController implements Serializable {
             model.addAttribute("session", httpSession.getAttribute("session"));
             httpSession.setAttribute("msg", "Prediction deleted successfully ..!! ");
 
-            return "redirect:/predictions";
+            if (type.equalsIgnoreCase("1")) {
+                return "redirect:/predictions";
+            } else {
+                return "redirect:/topTenPredictions";
+            }
         }
     }
 

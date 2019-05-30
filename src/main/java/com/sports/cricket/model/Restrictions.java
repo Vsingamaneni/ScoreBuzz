@@ -10,6 +10,8 @@ public class Restrictions implements Serializable {
 
     private Integer prize;
 
+    private Integer difference;
+
     private Integer count;
 
     public String getSecurityCode() {
@@ -43,4 +45,13 @@ public class Restrictions implements Serializable {
     public void setCount(Integer count) {
         this.count = count;
     }
+
+    public Integer getDifference() {
+        return difference;
+    }
+
+    public void setDifference(Integer difference) {
+        this.difference = difference;
+    }
 }
+

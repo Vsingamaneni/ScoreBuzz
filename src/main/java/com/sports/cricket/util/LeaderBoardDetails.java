@@ -178,16 +178,14 @@ public class LeaderBoardDetails implements Serializable {
         }
 
         Collections.sort(leaderBoardList, Comparator.comparing(LeaderBoard::getTotalWins).reversed()
-                .thenComparing(LeaderBoard::getPredictedCount));
-
-      //  Collections.sort(leaderBoardList, COUNT_TOP_WINS);
-      //  Collections.sort(leaderBoardList, COUNT_LESS_PREDICTIONS);
+                .thenComparing(LeaderBoard::getPredictedCount)
+                .thenComparing(LeaderBoard::getFirstName));
 
         int count = 1;
 
         for(LeaderBoard leader : leaderBoardList){
             if (restrictions.getCount() >= count){
-                leader.setPrizeMoney(restrictions.getPrize());
+                leader.setPrizeMoney(restrictions.getPrize()-500);
             } else {
                 leader.setPrizeMoney(0);
             }
@@ -196,13 +194,22 @@ public class LeaderBoardDetails implements Serializable {
             count++;
         }
 
+        addWinAmount(leaderBoardList, restrictions);
+
         return leaderBoardList;
     }
 
-    private static final Comparator<LeaderBoard> COUNT_TOP_WINS = Comparator
-            .comparing(LeaderBoard::getTotalWins);
-
-    private static final Comparator<LeaderBoard> COUNT_LESS_PREDICTIONS = Comparator
-            .comparing(LeaderBoard::getPredictedCount);
+    private static void addWinAmount(List<LeaderBoard> leaderBoardList, Restrictions restrictions){
+        if (!CollectionUtils.isEmpty(leaderBoardList)){
+            for (LeaderBoard leaderBoard : leaderBoardList){
+                if (leaderBoard.getRank() == 1){
+                    continue;
+                }
+                if (leaderBoard.getRank() <= restrictions.getCount()) {
+                    leaderBoard.setPrizeMoney(leaderBoard.getPrizeMoney() - ((leaderBoard.getRank() -1) * restrictions.getDifference()));
+                }
+            }
+        }
+    }
 
 }

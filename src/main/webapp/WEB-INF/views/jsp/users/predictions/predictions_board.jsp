@@ -135,8 +135,8 @@
                                 <td>${fn:toUpperCase(prediction.selected)}</td>
                                 <td>${fn:toUpperCase(prediction.predictedTime)}</td>
                                 <td>
-                                    <spring:url value="/prediction/${prediction.predictionId}/${prediction.matchNumber}/update" var="updateUrl" />
-                                    <spring:url value="/prediction/${prediction.predictionId}/delete" var="deleteUrl" />
+                                    <spring:url value="/prediction/${prediction.predictionId}/${prediction.matchNumber}/update/${choice}" var="updateUrl" />
+                                    <spring:url value="/prediction/${prediction.predictionId}/delete/${choice}" var="deleteUrl" />
 
                                     <c:if test="${prediction.canPredict}">
                                         <button class="btn btn-primary" onclick="location.href='${updateUrl}'">Update</button>
