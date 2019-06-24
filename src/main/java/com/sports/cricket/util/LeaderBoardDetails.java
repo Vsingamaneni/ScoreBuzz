@@ -183,7 +183,7 @@ public class LeaderBoardDetails implements Serializable {
 
         int count = 1;
 
-        for(LeaderBoard leader : leaderBoardList){
+        /*for(LeaderBoard leader : leaderBoardList){
             if (restrictions.getCount() >= count){
                 leader.setPrizeMoney(restrictions.getPrize()-500);
             } else {
@@ -192,9 +192,11 @@ public class LeaderBoardDetails implements Serializable {
 
             leader.setRank(count);
             count++;
-        }
+        }*/
 
-        addWinAmount(leaderBoardList, restrictions);
+       // addWinAmount(leaderBoardList, restrictions);
+
+        mapRank(leaderBoardList);
 
         return leaderBoardList;
     }
@@ -210,6 +212,28 @@ public class LeaderBoardDetails implements Serializable {
                 }
             }
         }
+    }
+
+    public static void mapRank(List<LeaderBoard> leaderBoardList){
+        int rank = 1;
+        if (!CollectionUtils.isEmpty(leaderBoardList)){
+            for (LeaderBoard leaderBoard : leaderBoardList){
+                if (leaderBoard.getRank() == null ) {
+                    rank = getMembers(leaderBoard.getTotalWins(), leaderBoard.getPredictedCount(), leaderBoardList,rank);
+                } else {
+                    continue;
+                }
+            }
+        }
+    }
+
+    public static int getMembers(int wins, int count, List<LeaderBoard> leaderBoardList, int rank){
+        for (LeaderBoard leaderBoard : leaderBoardList){
+            if (leaderBoard.getTotalWins() == wins && leaderBoard.getPredictedCount() == count){
+                leaderBoard.setRank(rank);
+            }
+        }
+        return rank+1;
     }
 
 }

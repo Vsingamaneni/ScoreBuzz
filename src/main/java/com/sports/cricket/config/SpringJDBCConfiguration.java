@@ -15,7 +15,7 @@ import java.util.Properties;
 
 @Configuration
 public class SpringJDBCConfiguration implements Serializable {
-    @Bean
+    /*@Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         //MySQL database we are using
@@ -29,9 +29,10 @@ public class SpringJDBCConfiguration implements Serializable {
         dataSource.setPassword("");
 
         return dataSource;
-    }
+    }*/
+
     // Google Cloud connection
-    /*@Bean
+    @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
@@ -52,7 +53,7 @@ public class SpringJDBCConfiguration implements Serializable {
 
         //dataSource.setUrl(System.getProperty("auto"));
         return dataSource;
-    }*/
+    }
 
     @Bean
     public JdbcTemplate jdbcTemplate() {

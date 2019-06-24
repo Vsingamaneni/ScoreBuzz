@@ -8,6 +8,8 @@ public class StatsCount {
 
     private int lostCount;
 
+    private int drawCount;
+
     public int getSelectedCount() {
         return selectedCount;
     }
@@ -30,5 +32,13 @@ public class StatsCount {
 
     public void setLostCount(int lostCount) {
         this.lostCount = lostCount;
+    }
+
+    public int getDrawCount() {
+        return drawCount;
+    }
+
+    public void setDrawCount(int drawCount) {
+        this.drawCount = drawCount;
     }
 }

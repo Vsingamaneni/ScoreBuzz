@@ -1,15 +1,14 @@
 package com.sports.cricket.util;
 
-import com.sports.cricket.model.*;
+import com.sports.cricket.model.Register;
+import com.sports.cricket.model.Standings;
+import com.sports.cricket.model.StatsCount;
+import com.sports.cricket.model.StatsDetails;
+
+import java.util.*;
 
 import static java.util.Comparator.nullsLast;
 import static java.util.Comparator.reverseOrder;
-import static java.util.Map.Entry.comparingByValue;
-import static java.util.stream.Collectors.toMap;
-
-import java.text.DecimalFormat;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class StatisticsDetails {
 
@@ -124,6 +123,8 @@ public class StatisticsDetails {
                 statsCount.setSelectedCount(statsCount.getSelectedCount()+1);
                 if (standings.getSelected().equals(standings.getWinner())) {
                     statsCount.setWonCount(statsCount.getWonCount() +1);
+                } else if (standings.getWinner().equalsIgnoreCase("DRAW")) {
+                    statsCount.setDrawCount(statsCount.getDrawCount() +1);
                 } else if (!standings.getSelected().equals("default")){
                     statsCount.setLostCount(statsCount.getLostCount() +1);
                 }
@@ -134,6 +135,8 @@ public class StatisticsDetails {
                 statsCount.setSelectedCount(1);
                 if (standings.getSelected().equals(standings.getWinner())) {
                     statsCount.setWonCount(1);
+                } else if (standings.getWinner().equalsIgnoreCase("DRAW")) {
+                    statsCount.setDrawCount(statsCount.getDrawCount() +1);
                 }else if (!standings.getSelected().equals("default")){
                     statsCount.setLostCount(1);
                 }

@@ -118,12 +118,13 @@
                             <td style="text-align:left;"> ${fn:toUpperCase(leader.lastName)}</td>
                             <td style="text-align:left;">${leader.totalWins}</td>
                             <td style="text-align:left;">${leader.predictedCount}</td>
-                            <c:if test="${leader.prizeMoney == 0}">
+                            <td>TBD</td>
+                            <%--<c:if test="${leader.prizeMoney == 0}">
                                 <td style="text-align:left;">-500</td>
                             </c:if>
                             <c:if test="${leader.prizeMoney != 0}">
                                 <td style="text-align:left;">${leader.prizeMoney}</td>
-                            </c:if>
+                            </c:if>--%>
                         </tr>
                     </c:if>
                 </table>
@@ -150,12 +151,13 @@
                                 <td style="text-align:left;"> ${fn:toUpperCase(leaderBoard.lastName)}</td>
                                 <td style="text-align:left;">${leaderBoard.totalWins}</td>
                                 <td style="text-align:left;">${leaderBoard.predictedCount}</td>
-                                <c:if test="${leaderBoard.prizeMoney == 0}">
+                                <td>TBD</td>
+                                <%--<c:if test="${leaderBoard.prizeMoney == 0}">
                                     <td style="text-align:left;">-500</td>
                                 </c:if>
                                 <c:if test="${leaderBoard.prizeMoney != 0}">
                                     <td style="text-align:left;">${leaderBoard.prizeMoney}</td>
-                                </c:if>
+                                </c:if>--%>
                             </tr>
                         </c:forEach>
                     </c:if>

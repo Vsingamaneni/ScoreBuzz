@@ -107,6 +107,7 @@
                         <th># Selected</th>
                         <th># Won</th>
                         <th># Lost</th>
+                        <th># Draw</th>
                     </tr>
                     </thead>
 
@@ -117,6 +118,7 @@
                                 <td style="text-align:left;"> ${statsDetails.value.selectedCount}</td>
                                 <td style="text-align:left;"> ${statsDetails.value.wonCount}</td>
                                 <td style="text-align:left;"> ${statsDetails.value.lostCount}</td>
+                                <td style="text-align:left;"> ${statsDetails.value.drawCount}</td>
                             </tr>
                         </c:forEach>
                     </c:if>
