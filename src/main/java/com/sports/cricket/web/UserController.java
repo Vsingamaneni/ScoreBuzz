@@ -1218,11 +1218,15 @@ public class UserController implements Serializable {
             httpSession.setAttribute("session", userLogin);
 
             List<TrackSettlement> displaySettlements = scheduleService.getSettlementsTrack();
+            List<String> allSettlements = SettlementUtil.mapSettlements(displaySettlements);
 
             List<TrackSettlement> mySettlementHistory = SettlementUtil.mySettlementHistory(displaySettlements, userLogin);
+            List<String> mySettlements = SettlementUtil.mapSettlements(displaySettlements);
 
             model.addAttribute("displaySettlements", displaySettlements);
+            model.addAttribute("allSettlements", allSettlements);
             model.addAttribute("mySettlementHistory", mySettlementHistory);
+            model.addAttribute("mySettlements", mySettlements);
 
             httpSession.setMaxInactiveInterval(5 * 60);
             return "users/settlement/display";

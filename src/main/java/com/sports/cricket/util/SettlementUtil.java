@@ -97,4 +97,20 @@ public class SettlementUtil {
         }
         return "";
     }
+
+    public static List<String> mapSettlements(List<TrackSettlement> settlementList){
+        List<String> allSettlements = new ArrayList<>();
+        String addSettlement;
+        if (!CollectionUtils.isEmpty(settlementList)){
+            for (TrackSettlement settlement : settlementList){
+                if (settlement.getSettledAmount() < 0 ){
+                    addSettlement = settlement.getSettledName() + " sent " + Math.abs(settlement.getSettledAmount()) + " to " + settlement.getName();
+                } else {
+                    addSettlement = settlement.getName() + " sent " + Math.abs(settlement.getSettledAmount()) + " to " + settlement.getSettledName();
+                }
+                allSettlements.add(addSettlement);
+            }
+        }
+        return allSettlements;
+    }
 }

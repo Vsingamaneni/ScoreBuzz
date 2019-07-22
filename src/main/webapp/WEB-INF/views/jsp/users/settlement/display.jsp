@@ -77,9 +77,7 @@
         </c:if>
 
         <c:if test="${role.equalsIgnoreCase('admin')}">
-            <a href="/saveResult" class="w3-bar-item w3-button w3-padding"><i class="fa fa-legal"></i>&nbsp; Update
-                Result</a>
-
+            <%@include file="../navigation/admin.jsp" %>
         </c:if>
         <a href="/logout" class="w3-bar-item w3-button w3-padding"><i class="fa fa-power-off"></i>&nbsp; Logout</a>
     </div>
@@ -104,10 +102,10 @@
 
                 <table class="w3-table w3-striped w3-white" style="text-align: center; align:center; align-content: center">
 
-                    <c:if test="${not empty mySettlementHistory}">
-                        <c:forEach var="settlement" items="${mySettlementHistory}">
+                    <c:if test="${not empty mySettlements}">
+                        <c:forEach var="settlement" items="${mySettlements}">
                             <tr style="color:black;font-size:20px;text-decoration:none;font-family:Comic Sans MS">
-                                <td style="text-align:left;"> ${settlement.settledName} sent ${settlement.settledAmount} to ${settlement.name} on ${settlement.settledTime}</td>
+                                    <td style="text-align:left;"> ${settlement}</td>
                             </tr>
                         </c:forEach>
                     </c:if>
@@ -117,10 +115,10 @@
                 <h1 style="text-align: center;">Settlements</h1>
                 <table class="w3-table w3-striped w3-white" style="text-align: center; align:center; align-content: center">
 
-                    <c:if test="${not empty displaySettlements}">
-                        <c:forEach var="settlement" items="${displaySettlements}">
+                    <c:if test="${not empty allSettlements}">
+                        <c:forEach var="settlement" items="${allSettlements}">
                             <tr style="color:black;font-size:20px;text-decoration:none;font-family:Comic Sans MS">
-                                <td style="text-align:left;"> ${settlement.settledName} sent ${settlement.settledAmount} to ${settlement.name} on ${settlement.settledTime} </td>
+                                    <td style="text-align:left;"> ${settlement}</td>
                             </tr>
                         </c:forEach>
                     </c:if>
